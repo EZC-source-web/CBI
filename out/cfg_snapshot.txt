@@ -1,0 +1,35 @@
+N: 60
+T_grid: [50    75   100   125   150   175   200   225   250   275   300   325   350   375   400   425   450   475   500   600   700   800   900  1000  1250  1500  1750  2000]
+R: 500
+batch_len_L: 25
+dgp_id_stage6: DFM_CTX_MODERATE
+dgp_id_stage7: DFM_CTX_STRONG
+scenario_stage6: E
+scenario_stage7: E2
+n_bins_lambda: 3
+n_bins_time: 3
+ucb_c: 0.5
+bins_grid: [321      321]
+c_grid: [0.5           1           2]
+Delta: 1
+rho_reveal: 0.9
+target_obs_rate: 0.6
+holdout_rate: 0.2
+nuisance_mode: estimated
+nuisance_update: batch
+do_calibration: 1
+do_stage_ladder: 0
+do_feedback_grid: 0
+T_calib: 200
+T_stage_ladder: 200
+rho_grid: [0.5         0.7         0.9]
+Delta_grid: [0  1  2]
+sparsity_thr: 5
+use_parallel: 1
+out_root: /Users/emiliozanettichini/Desktop/cbi_mc_matlab_paperMC_v12/out
+include_normalized_gain: 0
+run_id: paper_mc_v12
+do_main_scaling: 1
+main_scaling_stages: [6  7]
+generated_at: 21-Feb-2026 23:19:08
+run_stamp: 20260221_231908

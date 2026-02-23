@@ -1,0 +1,84 @@
+\section{Monte Carlo simulation}
+
+This section documents the paper-grade Monte Carlo exercise used to evaluate the contextual policy \textsc{CBI-UCB} with a doubly-robust pseudo-loss under panel missingness and partial/delayed feedback. The accompanying MATLAB package exports a small number of consolidated exhibits (few, but information-dense) into \texttt{out/exhibits/}; the LaTeX below reads those files directly. All reported numbers are Monte Carlo means, with Monte Carlo standard errors (MCSE) in parentheses.
+We use the standard UCB exploration bonus (with exploration constant $c$); see \cite{LattimoreSzepesvari2020} for a textbook treatment.
+
+\subsection{Objective}
+We study when and why the policy (i) beats the best static arm (value of context) and (ii) fails. The simulation is designed to make the main failure modes referee-visible: sparsity of context\,$\times$\,arm counts due to overly fine discretization, batching and feedback fragmentation, exploration costs, and distortion induced by noisy proxy risk estimates.
+
+\subsection{Data generating process}
+For each replication we simulate a panel $Y_{it}$ with a single latent factor,
+\begin{equation}
+Y_{it} = g(F_t)\,\lambda_i + \varepsilon_{it}, \qquad i=1,\dots,N,\ t=1,\dots,T,
+\end{equation}
+with $F_t$ following an AR(1) dynamic and $\varepsilon_{it}$ i.i.d. noise. Missingness is drawn cell-by-cell through a logistic rule that depends on an observable contextual covariate built from $(\lambda_i,t)$; this corresponds to a baseline MAR design where selection depends on observables \cite{Rubin1976}, and aligns with propensity-based weighting ideas in missing-data econometrics \cite{Wooldridge2007}. A ``holdout'' mask selects evaluation cells: all MSEs reported below are computed on the holdout.
+
+\paragraph{Econometric motivation.}
+The baseline panel model mirrors the dynamic factor structure commonly used in econometric applications with large panels and ragged-edge data releases, where missing values and publication delays are handled via state-space representations and filtering/smoothing methods.\footnote{See e.g. \cite{GiannoneReichlinSmall2008,BanburaModugno2014} for dynamic factor models with staggered releases and arbitrary missingness patterns, and \cite{BaiNg2002} for approximate factor structures in large $N,T$ panels.}
+
+\paragraph{DGP catalog.}
+All paper-grade DGPs are declared in the MATLAB file \texttt{src/dgp\_library.m}. The main text focuses on two calibrated environments:
+\begin{itemize}
+\item \textbf{DFM\_CTX\_MODERATE} (Scenario E; bridge): mild heterogeneity across units, so the value of context is limited and exploration/batching costs can dominate in short horizons.
+\item \textbf{DFM\_CTX\_STRONG} (Scenario E2; main): strong heterogeneity (regimes indexed by $\lambda_i$) so the identity of the best imputation arm switches across contexts.
+\end{itemize}
+
+Delayed feedback is implemented at the batch level: only holdout cells can become revealed, each with probability $\rho$, and their reveal is delayed by $\Delta$ batches. This creates partial and stale feedback in the pseudo-loss used for learning.
+
+\subsection{Policy, scenarios, and benchmarks}
+The action set contains $K=4$ imputation arms. The policy selects one arm per cell using a contextual LCB rule based on doubly-robust risk estimates plus an exploration bonus. We treat:
+\begin{itemize}
+\item \textbf{Scenario E} as a baseline/bridge environment with simpler/less restrictive feedback (internal Stage 6);
+\item \textbf{Scenario E2} as the full setting with delayed/partial feedback (internal Stage 7).
+\end{itemize}
+
+Benchmarks are reported alongside the policy:
+\begin{itemize}
+\item \textbf{Best(static)}: the best arm in hindsight (single arm used everywhere);
+\item \textbf{Oracle(ctx)}: the best arm within each context bin (infeasible, but isolates the value of context);
+\item \textbf{Policy}: \textsc{CBI-UCB}.
+\end{itemize}
+We report gaps to both benchmarks, and a sparsity diagnostic for the context\,$\times$\,arm selection counts.
+
+\subsection{Paper-grade design}
+The experiment follows the design directives used throughout the paper-grade package:
+\begin{enumerate}
+\item \textbf{Scaling in $T$ with constant batch length $L$}: we fix $L$ and set $B=\lfloor T/L\rfloor$ so that the feedback delay in \emph{periods} is stable as $T$ grows.
+\item \textbf{Context discretization}: the baseline uses a coarse grid ($3\times 3$ bins). An optional 3-level coarsening sensitivity ($3\times 3$, $2\times 2$, $1\times 1$) documents the induced sparsity.
+\item \textbf{Exploration sensitivity}: an optional 3-level sensitivity in the UCB constant $c\in\{0.5,1,2\}$ documents exploration costs.
+\item \textbf{Scenario bridge (E vs E2)}: the main scaling exhibit reports both scenarios on the same $T$ grid.
+\item \textbf{Benchmarks}: Best(static) and Oracle(ctx) are always reported next to the policy.
+\item \textbf{MC reporting}: we use $R$ replications and report MCSE for every entry.
+\end{enumerate}
+
+\subsection{Exhibits (auto-generated)}
+\input{PaperMCExhibits}
+
+\subsection{How to read the main exhibit (interpretation guide)}
+The main exhibit is organized around the same object a referee expects in simulation work: a \emph{functional} of performance as the horizon grows.
+The figure reports two complementary views of the policy performance as $T$ increases (holding $L$ fixed):
+\begin{itemize}
+\item \emph{oracle regret} (Policy MSE minus Oracle(ctx) MSE), which should decrease toward zero as the policy learns the best arm in each context;
+\item \emph{win rate} $\mathbb P(\text{Gap}<0)$, i.e. the fraction of replications in which the policy beats Best(static) (a power-like diagnostic).
+\end{itemize}
+\noindent
+To interpret these objects jointly, decompose the excess risk against the best static arm as
+\begin{equation}
+\text{Gap} \,=\, \text{Policy}-\text{Best(static)} \,=\, \underbrace{\bigl(\text{Policy}-\text{Oracle(ctx)}\bigr)}_{\text{Regret}} \, - \,
+\underbrace{\bigl(\text{Best(static)}-\text{Oracle(ctx)}\bigr)}_{\text{CtxGain}}.
+\end{equation}
+Hence the win rate can be read as a ``threshold crossing'' probability,
+\begin{equation}
+\mathbb P(\text{Gap}<0) \,=\, \mathbb P\bigl(\text{Regret}<\text{CtxGain}\bigr),
+\end{equation}
+so failures can be attributed either to low context value (small CtxGain) or to slow/biased learning (large regret).
+Sparsity of context$\times$arm counts is reported in the \emph{table} to make failures attributable to discretization/feedback fragmentation rather than to ``bad luck''. (Optional sensitivity tables can be enabled if we want to further isolate the bins--sparsity trade-off and exploration costs.)
+
+\subsection{How to reproduce}
+From MATLAB:
+\begin{enumerate}
+\item optionally run \texttt{WIPE\_OUTPUTS.m} (clears \texttt{out/});
+\item run \texttt{S20\_main\_T\_scaling\_stage7.m} (writes the main exhibits and \texttt{run\_manifest.txt});
+\item optionally run \texttt{S10\_calibrate\_bins.m} and \texttt{S11\_calibrate\_ucb\_c.m} (writes a sensitivity table in \texttt{out/exhibits/});
+\item compile \texttt{text/PaperMCMain.tex} (or use the one-click driver \texttt{RUN\_ALL.m}).
+\end{enumerate}

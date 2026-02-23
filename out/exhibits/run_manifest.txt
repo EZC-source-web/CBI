@@ -1,0 +1,16 @@
+CBI paper-grade Monte Carlo: run manifest
+Generated: 20260221_231908
+
+N=60
+T_grid=[50 75 100 125 150 175 200 225 250 275 300 325 350 375 400 425 450 475 500 600 700 800 900 1000 1250 1500 1750 2000]
+R=500
+Batch length L=25 (constant)
+Reveal delay Delta=1 (in batches)
+Reveal prob rho=0.900
+Holdout rate=0.200
+Target obs rate=0.600
+Context bins (lambda,time)=(3,3)
+UCB exploration constant c=0.5
+Sparsity threshold (<thr)=5
+Nuisance mode=estimated
+Nuisance update=batch

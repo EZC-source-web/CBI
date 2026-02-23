@@ -1,0 +1,33 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{natbib}
+
+\geometry{margin=1in}
+
+% Where exhibits are written by the MATLAB suite
+\newcommand{\ExhibitDir}{../out/exhibits/}
+\graphicspath{{\ExhibitDir}}
+
+% Toggle optional sensitivity/calibration exhibits (off by default).
+\newif\ifShowCalibration
+\ShowCalibrationtrue
+
+\title{Monte Carlo Simulation (paper-grade bundle)}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\input{PaperMCSection}
+
+\bibliographystyle{apalike}
+\bibliography{References_MC}
+
+\end{document}
