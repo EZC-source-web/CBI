@@ -257,6 +257,7 @@ x0 = box(1); y0 = box(2); w = box(3); h = box(4);
 [T, N] = size(W);
 cw = w / N;
 ch = h / T;
+pad = 0.06 * min(cw, ch);
 for t = 1:T
     for j = 1:N
         v = W(t, j);
@@ -267,8 +268,9 @@ for t = 1:T
         else
             face = colors.missing;
         end
-        rectangle(ax, 'Position', [x0 + (j - 1) * cw, y0 + (t - 1) * ch, cw, ch], ...
-            'FaceColor', face, 'EdgeColor', 'none');
+        rectangle(ax, 'Position', [x0 + (j - 1) * cw - pad / 2, ...
+            y0 + (t - 1) * ch - pad / 2, cw + pad, ch + pad], ...
+            'FaceColor', face, 'EdgeColor', face, 'LineWidth', 0.01);
     end
 end
 rectangle(ax, 'Position', box, 'FaceColor', 'none', ...
