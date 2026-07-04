@@ -1,0 +1,17 @@
+--- /mnt/data/InternetAppendix_v20_draft.tex	2026-07-04 22:57:37.523965746 +0000
++++ /mnt/data/build_ia_v20/InternetAppendix_v20.tex	2026-07-04 23:02:27.531927638 +0000
+@@ -397,7 +397,13 @@
+         -\Prb\big[\sqrt{T_Z}\{\bar d(a,b)-\bar\mu_d\}\le x\big]\Big|\to_p 0 ,
+     \]
+     where $\Prb^\ast$ denotes the bootstrap distribution conditional on the sample.
+-    \item The same conclusions hold for the release-validation ratio $\bar\delta^Y(a,b)=\sum_\tau D_\tau(a,b)\big/\sum_\tau M_\tau$ and its bootstrap analogue, with target parameter $\bar\mu_\delta=\sum_\tau\E[D_\tau(a,b)]\big/\sum_\tau\E[M_\tau]$, by the delta method applied to the vintage-level mean vector.
++    \item The same conclusions hold for the release-validation ratio
++    \[
++      \bar\delta^Y(a,b)=\frac{\sum_\tau D_\tau(a,b)}{\sum_\tau M_\tau},
++      \qquad
++      \bar\mu_\delta=\frac{\sum_\tau\E[D_\tau(a,b)]}{\sum_\tau\E[M_\tau]},
++    \]
++    and its bootstrap analogue, by the delta method applied to the vintage-level mean vector.
+ \end{enumerate}
+ \end{iaproposition}
+ 

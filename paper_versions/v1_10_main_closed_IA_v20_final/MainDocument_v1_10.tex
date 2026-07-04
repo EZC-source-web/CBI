@@ -1,0 +1,1631 @@
+% CBI/BfP main document draft v1.07 - submission-safe polish
+
+\documentclass[a4paper, 12pt]{article}
+
+% ----------------- LAYOUT E FONT -----------------
+\usepackage[a4paper,top=1.25in,bottom=1.25in,left=1.25in,right=1.25in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{setspace}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage{rotating}
+\usepackage[labelfont=bf, labelsep=period, justification=centering]{caption}
+\usepackage{subcaption}
+\captionsetup[subfigure]{justification=centering}
+% Compact but stable exhibit placement
+\renewcommand{\topfraction}{0.90}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.70}
+\setlength{\textfloatsep}{14pt plus 2pt minus 4pt}
+\setlength{\floatsep}{12pt plus 2pt minus 3pt}
+\setlength{\intextsep}{12pt plus 2pt minus 3pt}
+\usepackage{multirow}
+\usepackage{ragged2e}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+
+% Exhibit notes: keep titles short above the exhibit and explanatory notes below.
+\newcommand{\exhibitnote}[2][0.96\textwidth]{%
+\vspace{0.65em}%
+\begin{minipage}{#1}%
+\footnotesize
+\emph{Notes:} #2
+\end{minipage}%
+}
+
+% Monte Carlo table cell: mean over Monte Carlo standard error
+\newcommand{\mcval}[2]{\begin{tabular}[c]{@{}c@{}}#1\\[-1pt]{\scriptsize (#2)}\end{tabular}}
+\newcommand{\mcna}{\textemdash}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{authblk}
+\usepackage{enumitem}
+\setcounter{Maxaffil}{0}
+\renewcommand\Affilfont{\itshape\small}
+
+% ----------------- CITAZIONI -----------------
+\usepackage[round]{natbib}
+
+% ----------------- TEOREMI E STILI UNIFICATI -------------
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{assumption}{Assumption}
+
+\theoremstyle{remark}
+
+% ----------------- HYPERREF -----------------
+\usepackage[colorlinks=true, hyperindex=true, bookmarks=true, pdfpagemode=UseOutlines, unicode]{hyperref}
+\hypersetup{
+    citecolor=blue,
+    filecolor=magenta,
+    linkcolor=red,
+    urlcolor=red,
+    pdftitle={Sequential Completion in Dependent Panels},
+    pdfauthor={Giovanni Urga and Emilio Zanetti Chini}
+}
+
+% ----------------- TIKZ & FIGURE -----------------
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning}
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black]
+\tikzstyle{diamond} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+% ----------------- SISTEMI E ALTRO -----------------
+\newenvironment{sistema}{\left\lbrace\begin{array}{@{}l@{}}}{\end{array}\right.}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prb}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Kcal}{\mathcal{K}}
+\newcommand{\Xcal}{\mathcal{X}}
+\newcommand{\Ucal}{\mathcal{U}}
+\newcommand{\Fcal}{\mathcal{F}}
+\newcommand{\Vcal}{\mathcal{V}}
+\newcommand{\1}{\mathbf{1}}
+
+% ----------------- TITLE PAGE METADATA -----------------
+\newcommand{\papertitle}{Sequential Completion in Dependent Panels}
+\newcommand{\paperauthorblock}{Giovanni Urga\textsuperscript{a} \and Emilio Zanetti Chini\textsuperscript{b}}
+\newcommand{\paperaddressblock}{%
+\textsuperscript{a}\,Centre for Econometric Analysis and Faculty of Finance, Bayes Business School, City St George's University of London, UK\\[2pt]
+\textsuperscript{b}\,Department of Economics (DSE), University of Bergamo, Italy}
+\newcommand{\paperthanks}{We thank participants at the CAMRisk Conference for helpful comments and suggestions. The usual disclaimer applies.}
+\newcommand{\paperdate}{July 1, 2026}
+\newcommand{\paperabstract}{%
+We study panel completion when unavailable entries must be filled before the completed panel is evaluated. This problem arises with unreleased cells, mixed-frequency variables, persistent non-availability, and target objects built from completed panels. We formulate it as panel-indexed sequential completion: a real-time rule selects one method from a finite menu using only decision-date information, linking completion units, later feedback, and the target criterion. In this way, delayed releases, aggregate restrictions, validation samples, and downstream losses become variants of the same econometric problem. We give conditions under which validation feedback identifies target rankings and characterize the gain-cost trade-off. Monte Carlo designs show sequential rules are useful only when state-dependent gain exceeds learning, delay, and mismatch costs. In FRED-MD vintages, the rule stays close to the best common-component benchmark, while INDPRO rankings differ modestly from local release accuracy.
+}
+\newcommand{\paperkeywords}{real-time data, missing observations, ragged edges, validation feedback, validation-target mismatch, adaptive method choice}
+\newcommand{\paperjel}{C23, C32, C38, C53, C55, C63}
+
+\title{\papertitle\thanks{\paperthanks}}
+\author[1]{Giovanni Urga}
+\author[2]{Emilio Zanetti Chini}
+\affil[1]{Centre for Econometric Analysis and Faculty of Finance, Bayes Business School, City St George's University of London, UK}
+\affil[2]{Department of Economics (DSE), University of Bergamo, Italy}
+\date{\paperdate}
+
+\begin{document}
+
+\pagenumbering{gobble}
+
+\maketitle
+\setlength{\parskip}{0pt}
+\vspace{-.85cm}
+
+\thispagestyle{empty}
+
+\begin{abstract}
+\paperabstract
+\end{abstract}
+\vspace{.5em}
+\begin{flushleft}
+\justifying
+\noindent\textbf{Keywords}: \paperkeywords.
+
+\vspace{0.5em}
+\noindent\textbf{JEL Codes}: \paperjel.
+\end{flushleft}
+
+\onehalfspacing
+\newpage
+\pagenumbering{arabic}
+
+\section{Introduction}
+\label{sec:introduction}
+
+
+Empirical work with panels often proceeds while the panel is still incomplete for the purpose at hand. At the date at which a forecast, factor estimate, structural object, or policy-relevant statistic is needed, some entries may not yet be released, may be measured on a different calendar, may remain unavailable for institutional reasons, or may matter only through an object constructed from the completed panel. The investigator must choose a feasible completion method using the information available at that date, while the evidence needed to evaluate the choice is observed later, on a related validation set, or through the performance of a downstream econometric object.
+
+This creates a sequential completion problem. Several methods may be admissible at the decision date, including local-history rules, cross-sectional pooling methods, common-component rules, state-space filters, interpolation or disaggregation rules, matrix-completion methods, and forecasting specifications. Their relative performance may vary with observable panel conditions such as release delay, data coverage, persistence, volatility, factor strength, or position in the publication calendar. The research question is: how should an investigator select among feasible completion methods when the losses needed to compare them are delayed, indirectly observed, or defined on a different target object?
+
+We study this problem as panel-indexed sequential completion under delayed or indirect validation. A real-time rule chooses from a finite menu of feasible completion methods using only decision-date information, and later feedback updates future choices. The object is the state-dependent ranking of existing econometric methods across panel environments in which the validation loss is delayed, indirect, or defined on an econometric target object.
+
+The motivating applications are closely connected to existing econometric work. Real-time macroeconomic databases and vintage data evaluation place ragged edges in a delayed-release environment \citep{CroushoreStark2001,McCrackenNg2016}. Nowcasting with partially observed macroeconomic panels \citep{GiannoneReichlinSmall2008,BanburaModugno2014,AkbalGiannone2026} and mixed-frequency modelling \citep{MarianoMurasawa2003,BaiGhyselsWright2013,AnkargrenJoneus2021} provide settings in which method choice is tied to publication calendars and aggregation restrictions. Large panels with missing entries, factor-based imputation, and low-rank completion \citep{BaiNg2021,JinMiaoSu2021,CahanBaiNg2023,XiongPelger2023,DuanPelgerXiong2024,SuWang2025} provide menus of reconstruction methods whose ranking can depend on the panel state. The present paper takes such methods as candidates and studies their sequential selection before validation losses are known.
+
+The main organizing distinction is between three populations. The \emph{decision population} contains the units requiring a method choice. The \emph{validation population} contains the units or objects on which feedback is observed. The \emph{target population} defines the criterion relevant for the empirical analysis. In an aligned delayed-release design, these populations coincide: an unreleased cell is completed at the decision date and evaluated when the same cell is released. In mixed-frequency, evaluable-missingness, and completed-panel designs, validation can be attached to an aggregate restriction, to comparable observed units, or to a downstream target object. The link from validation to target performance is then an identification condition for method selection.
+
+Contextual-bandit notation records the sequential timing. Panel states are \emph{contexts}, candidate completion methods are \emph{actions}, and delayed validation losses update later choices \citep{LaiRobbins1985,LattimoreSzepesvari2020}. The econometric content lies in the validation design, the target criterion, and the conditions under which validation risks preserve target rankings. Related work on policy learning and sequential decisions \citep{AtheyWager2021,Kock2022JASA} provides useful language for adaptive choice; the validation-target distinction is specific to the econometric environments considered here.
+
+The formal analysis builds the gain-cost comparison in three steps. To make this comparison accurate, the validation loss must first identify the target ranking: (i) validation risks must be informative about target risks; (ii) oracle and static benchmarks must be defined on the target criterion; and (iii) the feasible rule must learn from delayed and dependent validation feedback. The resulting bounds show when state-dependent completion improves on a fixed benchmark: the oracle gain must be large enough to cover validation-target mismatch, statistical learning costs, and initialization costs. The same decomposition gives an insurance interpretation: when the realized state-dependent gain is weak, the positive gap to the best static method is controlled by the learning, delay, and mismatch terms; when that gain is separated from zero, the feasible rule dominates the static benchmark once these costs vanish.
+
+The simulations and empirical illustration follow the same gain-cost logic. The Monte Carlo designs cover delayed releases, mixed-frequency validation, validation-population shifts, completed-panel target-object evaluation, and selected-arm feedback. They show when sequential completion recovers state-dependent gains and when delay, dependence, sparse validation, or target mismatch makes adaptation slow or unprofitable. The empirical illustration focuses on delayed-release validation because the other designs require different data architectures: aggregate-release restrictions, validation-population samples, or target-object feedback recorded at a different level. The delayed-release case offers a clean and widely studied real-time macroeconomic setting: FRED-MD vintages are public, familiar in the nowcasting literature, and allow direct comparison between fixed completion methods and the real-time selection rule.
+
+The FRED-MD application is a transparent real-time exercise. Across successive vintages, we compare economically meaningful completion methods by local release-validation accuracy and by the performance of a downstream one-month-ahead INDPRO target object. The best fixed common-component benchmark already performs well in local release validation, and the real-time rule remains close without dominating it. Downstream target-object rankings differ modestly from local rankings. The empirical evidence illustrates the central message: sequential completion is most valuable when state-dependent gains are large, and local release accuracy need not coincide with downstream usefulness.
+
+The remainder of the paper is organized as follows. Section~\ref{sec:taxonomy} describes four empirical cases of panel non-availability and delayed or indirect validation. Section~\ref{sec:selection} develops the common decision problem in terms of decision, validation, and target populations. Section~\ref{sec:specialization} studies the real-time panel-completion case. Section~\ref{sec:montecarlo} reports Monte Carlo evidence, and Section~\ref{sec:empirical-illustration} presents the FRED-MD illustration. Section~\ref{sec:conclusion} concludes.
+
+\section{Panel Non-Availability and Delayed Validation}
+\label{sec:taxonomy}
+
+This section describes four empirical designs in which a panel is incomplete at the decision date and validation is delayed, indirect, or defined on a different object. It records, for each design, the decision unit, the unavailable entries, the feedback that later becomes observable, and the target criterion used for evaluation. Real-time data analysis \citep{CroushoreStark2001,McCrackenNg2016} and observation-pattern work in incomplete panels \citep{BaiNg2021,JinMiaoSu2021,CahanBaiNg2023} motivate the organization, but the emphasis is the timing of validation.
+
+Figure~\ref{fig:taxonomy} summarizes the timing of the decision, validation, and target objects across the four designs.
+\begin{figure}[H]
+\centering
+\caption{Non-availability and feedback}
+\label{fig:taxonomy}
+\IfFileExists{Figures/Figure_Section2_Taxonomy.pdf}{%
+  \includegraphics[width=0.98\textwidth,height=0.58\textheight,keepaspectratio]{Figures/Figure_Section2_Taxonomy.pdf}%
+}{%
+  \IfFileExists{Figure_Section2_Taxonomy.pdf}{%
+    \includegraphics[width=0.98\textwidth,height=0.58\textheight,keepaspectratio]{Figure_Section2_Taxonomy.pdf}%
+  }{%
+  \fbox{%
+  \begin{minipage}[c][0.22\textheight][c]{0.94\textwidth}
+  \centering
+  \textbf{Section 2 taxonomy figure}\\[0.10cm]
+  Four-panel schematic: Panel A, delayed release; Panel B, mixed frequency; Panel C, evaluable missingness; Panel D, completed-panel target evaluation.
+  \end{minipage}}
+  }%
+}
+\exhibitnote{Dark cells denote information available at the decision date. Pale cells or blocks denote unavailable, incomplete, or indirectly evaluated units. Arrows indicate validation timing. Panel A represents delayed release; Panel B represents mixed-frequency aggregation; Panel C represents validation on an evaluable population; Panel D represents target-object evaluation after panel completion.}
+\end{figure}
+
+The organizing principle is the timing and location of validation, not the mechanism that renders an entry unavailable. This separates the classification from the standard missing-data taxonomy: whether an entry is missing completely at random, at random, or not at random speaks to \emph{why} it is absent, whereas the operative question here is \emph{when}, \emph{where}, and on which object its loss becomes observable. The two are orthogonal. A single mechanism can occupy different cells of the classification depending on the evaluation design---a not-at-random nonresponse is a delayed release when the true value is later published, an evaluable-missingness problem when it is recovered only on a comparable holdout, and a target-object problem when it matters solely through a downstream statistic. What fixes the method-selection problem is the feedback the investigator will actually receive, and at what horizon.
+
+Table~\ref{tab:taxonomy} records the same four cases by unavailable object, pre-validation choice, feedback, and loss; its purpose is to locate where decisions are made, where validation is observed, and which loss defines the target criterion.
+\begin{table}[H]
+\centering
+\caption{Cases and validation}
+\label{tab:taxonomy}
+%\footnotesize
+\setlength{\tabcolsep}{3.4pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular}{@{}>{\RaggedRight\arraybackslash}p{0.16\textwidth}>{\RaggedRight\arraybackslash}p{0.21\textwidth}>{\RaggedRight\arraybackslash}p{0.20\textwidth}>{\RaggedRight\arraybackslash}p{0.22\textwidth}>{\RaggedRight\arraybackslash}p{0.15\textwidth}@{}}
+\toprule
+Case & Unavailable unit & Pre-validation choice & Feedback & Loss \\
+\cmidrule(lr){1-1}\cmidrule(lr){2-2}\cmidrule(lr){3-3}\cmidrule(lr){4-4}\cmidrule(l){5-5}
+Delayed release / ragged edge
+& Cell $Y_{it}$ unreleased at vintage $\tau$
+& Completion $\widehat Y^{(k)}_{it|\tau}$
+& First release $Y_{it}$ at vintage $r_{it}$
+& Cell loss $\ell_{it\tau}(k)$ \\
+\addlinespace[2pt]
+Mixed frequency
+& High-frequency entry $Y_{i,t_h}$ or block $\mathcal B_\tau$
+& Interpolation, completion, or disaggregation rule $k$
+& Low-frequency release or aggregation restriction
+& Block or aggregate loss \\
+\addlinespace[2pt]
+Evaluable missingness
+& Persistent target cells or blocks
+& Method $k$ for the target population
+& Holdout cells, comparable units, or validation set
+& Validation loss $\ell^V_{u,b}(k)$ \\
+\addlinespace[2pt]
+Completed-panel evaluation
+& Incomplete vintage for a target object
+& Completion rule $k$
+& Realization of the target object, e.g. $Z_{\tau+h}$
+& Target loss $L^Z_\tau(k)$ \\
+\bottomrule
+\end{tabular}
+\exhibitnote{The table records decision-date non-availability, the pre-validation choice, the feedback signal, and the loss used for evaluation. The notation identifies the level at which the decision and loss are defined. In the delayed-release row, $r_{it}$ denotes the vintage at which the validation value is first available; the notation in the mixed-frequency and completed-panel rows is schematic and local to the table.}
+\end{table}
+
+The four designs are analytical cases rather than a partition of applications. A single panel routinely spans several of them at once: a mixed-frequency macro panel carries delayed releases at its monthly frontier and an aggregation restriction at the quarterly one, and its completed vintages then feed a downstream forecast. Isolating the cases is useful because each corresponds to a distinct configuration of the decision, validation, and target populations, and it is that configuration---not the substantive application---that governs whether validation losses identify the ranking relevant for the target. Section~\ref{sec:selection} formalizes the three populations and makes this dependence precise.
+
+\subsection{Delayed releases and ragged edges}
+
+The first design is temporary non-availability. At vintage \(\tau\), a panel entry \(Y_{it}\) may be unavailable because the corresponding release has not yet occurred. This ragged-edge structure is central in real-time macroeconomic datasets such as FRED-MD \citep{McCrackenNg2016}. The investigator must complete the current vintage, extract factors, construct predictors, or produce a nowcast before the value is observed. In Table~\ref{tab:taxonomy}, the unavailable object is the unreleased cell. In Panel A of Figure~\ref{fig:taxonomy}, the validation arrow links the decision vintage to the later release.
+
+Delayed releases give direct validation. If method \(k\) produces \(\widehat Y^{(k)}_{it|\tau}\), the local release loss is observed when \(Y_{it}\) first appears. With squared loss,
+\begin{equation*}
+  \ell_{it\tau}(k)=\left(\widehat Y^{(k)}_{it|\tau}-Y_{it}\right)^2 .
+\end{equation*}
+The delay affects timing, while the same cell supplies validation for the decision. Decision, validation, and local target populations coincide for the cellwise criterion. The aligned design is the benchmark case in which delayed releases directly validate the entries completed at the decision date. It is the case in which the validation-target link is least demanding.
+
+\subsection{Mixed-frequency non-availability}
+
+The second design arises when the operating frequency of the analysis is higher than the measurement frequency of some variables. A monthly macro panel may require a monthly representation of quarterly GDP; a quarterly firm panel may use annual balance-sheet information; a macro-financial panel may combine variables recorded on different calendars. This design covers mixed-frequency and aggregation settings common in macroeconomic panels, including temporal aggregation, state-space representations, and factor-model nowcasting applications \citep{MarianoMurasawa2003,BaiGhyselsWright2013,BanburaModugno2014,AnkargrenJoneus2021}.
+
+The validation object is usually a block, aggregate, or restriction. The high-frequency entry used by the analyst may never be observed directly at the operating frequency. Validation is supplied by a lower-frequency release or by an aggregation restriction linking the latent high-frequency path to an observed low-frequency value. The second row of Table~\ref{tab:taxonomy} records the choice as an interpolation, completion, or disaggregation rule. Panel B of Figure~\ref{fig:taxonomy} shows validation through the lower-frequency calendar and the aggregation restriction.
+
+Aggregate validation must be interpreted relative to the target criterion. Two methods may satisfy the same low-frequency restriction while implying different high-frequency paths. Those paths can have different implications for forecasting, factor estimation, or structural analysis. The mixed-frequency design therefore requires the analyst to state whether the aggregate or block loss is the target criterion, or a validation signal for a higher-frequency or downstream object.
+
+\subsection{Evaluable missingness}
+
+The third design concerns target entries that may remain unobserved. Survey nonresponse, confidential administrative records, discontinued series, proprietary financial information, reporting constraints, and counterfactual outcomes generate this type of non-availability. Factor-based imputation and matrix-completion methods \citep{BaiNg2021,JinMiaoSu2021,CahanBaiNg2023,XiongPelger2023,DuanPelgerXiong2024,SuWang2025} provide candidate methods. Sequential selection also requires an evaluable validation stream.
+
+The third row of Table~\ref{tab:taxonomy} lists possible validation sources: holdout cells, comparable units, repeated measurements, pseudo-real-time masks, or an external validation set. Panel C of Figure~\ref{fig:taxonomy} separates the target population from the validation population. A validation sample supports learning only to the extent that it is informative about method rankings on the target population.
+
+Let \(R^V_{j,k}\) denote the risk of method \(k\) in state \(j\) on the validation population, and let \(R^T_{j,k}\) denote the corresponding target risk. Sequential selection uses validation losses when differences in \(R^V_{j,k}\) preserve information about differences in \(R^T_{j,k}\). This link may be justified by randomized holdout design, overlap, reweighting, transport correction, or a maintained comparability condition. In the absence of a comparable validation stream, the target losses are not learned by adaptation; they require an identification argument linking validation and target populations.
+
+\subsection{Completed-panel target evaluation}
+
+In many applications the completed panel is an input into factor estimation, nowcasting, forecasting, structural estimation, treatment-effect analysis, portfolio construction, or policy evaluation. Forecasting with many predictors \citep{StockWatson2002}, factor models with interactive effects \citep{Bai2009}, and heterogeneous panels with common components \citep{Pesaran2006,PesaranPickTimmermann2024} illustrate settings in which the evaluated object is constructed from the completed panel. A method with small cellwise reconstruction errors may not deliver the best target-object performance.
+
+The fourth row of Table~\ref{tab:taxonomy} and Panel D of Figure~\ref{fig:taxonomy} distinguish local validation loss from target-object loss. Local validation compares \(\widehat Y_{it|\tau}\) with a subsequently observed \(Y_{it}\). Target-object evaluation applies a loss to a functional of the completed panel. If \(\Phi\) maps a completed vintage into the object of interest, a schematic target loss is
+\begin{equation*}
+  L^Z_\tau(k)=\mathcal L\left(\Phi\left(\widehat Y^{(k)}_\tau\right), Z_{\tau+h}\right).
+\end{equation*}
+The map \(\Phi\) may average some local errors, amplify others, or depend mainly on common components, turning points, or predictive coordinates.
+
+Completed-panel target evaluation is a distinct criterion. The downstream object should be specified in advance, the target equation should be kept fixed across completion rules, and the completion method should be the object that varies. The empirical application follows this design: the release-validation layer evaluates local frontier losses, and the target-object layer evaluates one-month-ahead INDPRO performance from completed panels generated by the same method classes.
+
+\vspace{0.7em}
+\noindent\textbf{Common structure.}
+The four designs share the same decision structure. At the decision date, the available panel information determines the relevant state, and one completion method is selected from a finite menu. The evaluating loss is unavailable at that date and arrives later through a release, through an aggregate or validation population, or through a completed-panel target object. The common primitives are the decision unit, the method menu, the validation signal, and the target criterion.
+
+Across the four cases, a completion method must be chosen before the relevant validation or target loss is fully observed. State-dependent selection has value when method rankings vary with observable panel states such as release delay, data coverage, local persistence, cross-sectional dependence, volatility, factor strength, or position in the publication calendar. The validation signal must identify or preserve the target ranking, the state-dependent gain must be large enough to matter relative to learning costs, and the relevant state dependence must be learned from delayed and dependent feedback.
+
+\section{Panel-Indexed Sequential Completion}
+\label{sec:selection}
+
+This section develops the common decision problem introduced in Section~\ref{sec:taxonomy}: a decision-date rule that chooses among feasible completion methods before the relevant validation loss is observed. Method choice is made with the current information set. Performance is evaluated later, on a validation population, or through a target object constructed from the completed panel.
+
+The formulation distinguishes decision, validation, and target populations. The decision population contains the units requiring a method choice. The validation population contains the units or objects from which feedback is observed. The target population contains the units and criterion used for final evaluation. These populations coincide in the aligned delayed-release design and may differ in mixed-frequency, evaluable-missingness, and completed-panel target-object designs. The link between validation and target performance is therefore an identification requirement for method selection.
+
+The notation follows sequential decision theory while keeping the econometric objects explicit. The finite menu contains prespecified estimators, completion rules, filters, disaggregation rules, or forecasting specifications. The state summarizes decision-date panel information, and the selection rule maps states into methods. The notation records real-time feasibility and delayed feedback; the substantive restrictions concern validation, target risk, and dependence in panel data.
+
+The results are stated for a finite method menu and a finite partition of the state space. Let \(b=1,\ldots,B\) index generic decision dates. In the real-time completion case below, these dates are data vintages and are denoted by \(\tau\). The gain is the oracle-static reduction in target risk from conditioning on the panel state; the costs are validation-target mismatch, sampling error from delayed and dependent feedback, and initialization. Proofs are collected in Appendix~\ref{app:proofs}.
+
+\subsection{Decision problem, feedback regimes, and validation}
+
+Let \(b=1,\ldots,B\) index decision batches, data vintages, or operating dates. At the beginning of batch \(b\), the investigator observes a \(\sigma\)-field \(\Fcal_b\). This information set contains the panel entries released so far, the current observation pattern, past method choices, and validation losses that have already arrived. It excludes validation information generated by current and future decisions. At batch \(b\), a finite set \(\Ucal_b\) of decision units requires method choices. A decision unit may be a cell, a cell-vintage pair, a block of high-frequency placeholders, a validation unit, or an object constructed from a completed panel.
+
+For each decision unit \((u,b)\), the investigator observes a state \(X_{u,b}\). The state is a decision-date summary of the panel environment. It may include the age of an unreleased entry, current panel coverage, the position of a series in a release calendar, local dynamics, volatility, cross-sectional dependence, or measures of common-factor strength. The state need not summarize the full data-generating process; it is the decision-date information on which the method-selection rule conditions.
+
+The implemented rule maps the observed state into a finite state label and then selects one method from a finite menu:
+\begin{equation}
+\label{eq:state-and-action}
+    G_{u,b}=g(X_{u,b})\in\{1,\ldots,J\},
+    \qquad
+    A_{u,b}=\pi_b(G_{u,b})\in\Kcal=\{1,\ldots,K\} .
+\end{equation}
+Equation~\eqref{eq:state-and-action} imposes real-time feasibility. The finite state label is computed from \(\Fcal_b\), and the selected element of \(\Kcal\) belongs to the prespecified menu of econometric methods. In the notation used throughout the paper, \(\Kcal\) is the method menu and \(\pi_b\) is the decision-date selection rule.
+
+\begin{assumption}[Finite menu, finite state labels, and real-time feasibility]
+\label{ass:rt-feasibility}
+The decision environment satisfies the following restrictions.
+\begin{enumerate}[label=(\alph*), leftmargin=*]
+    \item The candidate set \(\Kcal\) and the finite state-label space \(\{1,\ldots,J\}\) are finite. The state-label map \(g:\Xcal\to\{1,\ldots,J\}\) is fixed and known.
+    \item For every batch \(b\) and every \(u\in\Ucal_b\), the state \(X_{u,b}\), the finite state label \(G_{u,b}\), and the selected method \(A_{u,b}\) are \(\Fcal_b\)-measurable.
+    \item If the rule uses randomization, the randomization is realized before the decision at batch \(b\) and is included in \(\Fcal_b\).
+    \item No decision at batch \(b\) may use validation information generated by current decisions or by future decisions.
+\end{enumerate}
+\end{assumption}
+
+Assumption~\ref{ass:rt-feasibility} is the real-time information restriction. Part (a) fixes the objects over which learning takes place: the method menu and the state partition are chosen before evaluation. Part (b) gives the measurability requirement for real-time implementation. Part (c) allows randomized selection rules when the randomization is part of the decision-date information set. Part (d) excludes current and future validation outcomes from the current decision. The candidate methods themselves may be local, factor-based, state-space, matrix-completion, mixed-frequency, or forecasting rules, as long as their candidate values and the states used to select among them are functions of \(\Fcal_b\).
+
+We next define the feedback generated by a decision. For each decision unit \((u,b)\), let \(V_{u,b}\) indicate membership in the validation population and \(T_{u,b}\) membership in the target population. If method \(k\) is evaluated on the validation criterion, its potential validation loss is \(\ell^V_{u,b}(k)\). The corresponding target loss is \(\ell^T_{u,b}(k)\).
+
+Validation and target losses can coincide or differ. In the aligned delayed-release design, a cell completed at the decision date is later observed and the same squared error can be used for local validation and target evaluation. In completed-panel target-object evaluation, local cell losses and downstream forecast or nowcast losses are distinct. The notation keeps these objects separate because the feedback used for learning need not be the criterion used for final evaluation.
+
+Validation may arrive with delay. Let \(D_{u,b}\) be defined so that the validation signal associated with \((u,b)\), if it exists, is usable for decisions at batch \(r\) only when \(b+D_{u,b}<r\). If the decision unit is not validated, set \(D_{u,b}=+\infty\). The set of method losses observed when validation arrives is denoted by \(\Kcal^V_{u,b}\subseteq\Kcal\). Two feedback regimes are useful benchmarks:
+\begin{equation*}
+\begin{aligned}
+    \Kcal^V_{u,b}&=\{A_{u,b}\}
+    &&\text{under selected-arm feedback,}
+    \\
+    \Kcal^V_{u,b}&=\Kcal
+    &&\text{under delayed full-validation feedback.}
+\end{aligned}
+\end{equation*}
+Selected-arm feedback is the partial-feedback case: after validation arrives, only the loss of the method chosen at the decision date is observed. Delayed full-validation feedback is common in econometric validation. Once the validation value is released, the analyst can score all candidate methods that were stored at the decision date or can be reproducibly reconstructed from the archived information set. Real-time macro panel completion has this second form. The distinction matters because selected-arm feedback requires exploration or another overlap mechanism, whereas delayed full validation can score all methods on the same validated unit.
+
+\subsection{Target risks, identification, and benchmarks}
+
+The method chosen at the decision date is evaluated under a target criterion. The target criterion may coincide with the validation criterion, as in local first-release evaluation, or differ from it, as in validation-population shifts and completed-panel target-object evaluation. We therefore define risks separately for the feedback used to learn and for the criterion used to evaluate performance.
+
+Let \(p^T_j\) be the target-population weight of state \(j\); in superpopulation notation, \(p^T_j=\Prb\{G_{u,b}=j\mid T_{u,b}=1\}\). In a finite evaluation window, the same object is the corresponding target-population share. Let \(\mathcal J_T=\{j\in\{1,\ldots,J\}:p^T_j>0\}\). Only states in \(\mathcal J_T\) contribute to target risk. States that appear in the validation archive but not in the target population may be useful for diagnostics, but they do not affect target regret.
+
+For each target-relevant state \(j\) and method \(k\), let \(R^V_{j,k}\) denote the validation risk and \(R^T_{j,k}\) the target risk. Their excess-risk versions are defined relative to the best method in the same state:
+\begin{equation}
+\label{eq:state-risks}
+\begin{aligned}
+    R^V_{j,k}
+    &=
+    \E\!\left[\ell^V_{u,b}(k)\mid G_{u,b}=j,\ V_{u,b}=1\right],
+    &
+    R^T_{j,k}
+    &=
+    \E\!\left[\ell^T_{u,b}(k)\mid G_{u,b}=j,\ T_{u,b}=1\right],
+    \\
+    \Delta^q_{j,k}
+    &=
+    R^q_{j,k}-\min_{m\in\Kcal}R^q_{j,m},
+    && q\in\{V,T\} .
+\end{aligned}
+\end{equation}
+The risks in \eqref{eq:state-risks} are population objects for the evaluation problem under study. They can be read as superpopulation risks or as limits of finite-population averages over a panel-vintage evaluation window. Dependence across units, calendar time, or vintages enters the estimation of these risks from the validation archive.
+
+The target risk \(R^T_{j,k}\) defines the object of interest: the method ranking for the target population and target criterion. The validation risk \(R^V_{j,k}\) is the object informed directly by feedback. When validation and target risks differ, the validation archive is informative for method selection only under a restriction linking validation performance to target performance.
+
+\begin{assumption}[Risks and validation-target link]
+\label{ass:validation-target-link}
+For every \(j\in\mathcal J_T\) and every \(k\in\Kcal\), the following conditions hold.
+\begin{enumerate}[label=(\alph*), leftmargin=*]
+    \item The potential validation and target losses \(\ell^V_{u,b}(k)\) and \(\ell^T_{u,b}(k)\) are well defined at the decision-unit level used in the analysis and have finite first moments on their respective populations.
+    \item For each \(B\), the risks in \eqref{eq:state-risks} are well-defined population averages over the corresponding decision environment. In triangular environments, risks and excess risks may depend on \(B\); this dependence is suppressed unless it affects the approximation.
+    \item There exist constants \(\Lambda<\infty\) and \(\eta_B\geq0\) such that
+    \begin{equation}
+    \label{eq:validation-target-link}
+        \Delta^T_{j,k}\leq \Lambda\Delta^V_{j,k}+\eta_B .
+    \end{equation}
+\end{enumerate}
+\end{assumption}
+
+Assumption~\ref{ass:validation-target-link} is the validation-target restriction. Part (a) ensures that the potential losses being compared are defined on the decision units used in the analysis. Part (b) fixes the population interpretation of the risks while allowing finite-window or triangular-array sequences. Part (c) is the substantive bridge condition: within each target-relevant state, small validation excess risk implies small target excess risk up to the residual mismatch \(\eta_B\).
+
+The bridge is one-sided: for method selection, validation minimizers must be good for the target criterion, while validation and target risks or populations may differ. In the aligned delayed-release design, \(\eta_B=0\) and \(\Lambda=1\) for the local release criterion. In evaluable-missingness designs, the same condition is a transport restriction from the validation population to the target population. In completed-panel evaluation, it is a bridge from local validation loss to downstream target-object loss. A validation archive can be statistically precise and still fail to rank methods for the target criterion if this link breaks down.
+
+A second requirement is observability. The validation risks in \eqref{eq:state-risks} must be recoverable from the losses observed when feedback arrives. This requires overlap in the validation archive and preservation of the relevant conditional mean.
+
+\begin{assumption}[Observable validation, overlap, and mean preservation]
+\label{ass:observable-validation}
+For every \(j\in\mathcal J_T\) and every \(k\in\Kcal\), the observed validation stream satisfies the following conditions.
+\begin{enumerate}[label=(\alph*), leftmargin=*]
+    \item The state-method cell has positive observable validation probability:
+    \begin{equation*}
+        \Prb\{V_{u,b}=1,\ k\in\Kcal^V_{u,b}\mid G_{u,b}=j\}>0 .
+    \end{equation*}
+    \item Observable validation preserves the validation mean:
+    \begin{equation*}
+        \E\!\left[\ell^V_{u,b}(k)\mid G_{u,b}=j,\ V_{u,b}=1,\ k\in\Kcal^V_{u,b}\right]
+        =R^V_{j,k} .
+    \end{equation*}
+\end{enumerate}
+\end{assumption}
+
+Assumption~\ref{ass:observable-validation} identifies the validation risks from the observed feedback stream. Part (a) requires each target-relevant state-method pair to appear in observable validation records. In delayed full-validation designs this is mainly a condition on the validation population, because every validated unit can be scored under every candidate method. In selected-arm designs it also requires exploration, randomization, or another mechanism that makes each method observable often enough in each state. Part (b) rules out validation selection that changes the relevant conditional mean. If validation records are selected on loss components not captured by the state, observed validation losses need not identify \(R^V_{j,k}\).
+
+Assumptions~\ref{ass:validation-target-link} and~\ref{ass:observable-validation} play different roles. Assumption~\ref{ass:observable-validation} identifies validation risks from observed feedback. Assumption~\ref{ass:validation-target-link} makes those validation risks informative about the target ranking. Proposition~\ref{prop:identification} records the resulting population implication before any sampling or sequential-learning argument is introduced.
+
+\begin{proposition}[Validation identification and target link]
+\label{prop:identification}
+Suppose Assumptions~\ref{ass:validation-target-link} and \ref{ass:observable-validation} hold. Then, for every \(j\in\mathcal J_T\), the following statements hold.
+\begin{enumerate}[label=(\alph*), leftmargin=*]
+    \item The validation risks \(R^V_{j,k}\), \(k\in\Kcal\), are identified from observable validation losses.
+    \item If \(k_V\in\argmin_{k\in\Kcal}R^V_{j,k}\), then \(\Delta^T_{j,k_V}\leq\eta_B\). If \(\eta_B=0\), every validation-risk minimizer is target-optimal:
+    \begin{equation}
+    \label{eq:identified-selector}
+        \argmin_{k\in\Kcal}R^V_{j,k}
+        \subseteq
+        \argmin_{k\in\Kcal}R^T_{j,k} .
+    \end{equation}
+    \item If the maintained validation-target link also implies equality of the validation and target minimizer sets, the target minimizer set is identified from validation risks. Under this coincidence, if the target minimizer is unique in state \(j\), then any validation-risk minimizer identifies the unique target-optimal method in that state.
+\end{enumerate}
+\end{proposition}
+
+Proposition~\ref{prop:identification} is an identification statement. Part (a) identifies state-method validation risks under observable feedback and mean preservation. Part (b) transfers validation optimality to target near-optimality through the bridge condition; with an exact bridge, validation minimizers are target-optimal. Part (c) gives the stronger case in which the whole target minimizer set is recovered from validation risks. Finite-sample learning enters only after this population target has been identified.
+
+We now define two population benchmarks. The target oracle chooses, in each target-relevant state, a method minimizing target risk. The static benchmark uses a single method for all states. Their difference measures the population value of conditioning method choice on the panel state:
+\begin{equation}
+\label{eq:oracle-static-gain}
+\begin{aligned}
+    \pi_T^\star(j)
+    &\in
+    \argmin_{k\in\Kcal}R^T_{j,k},
+    &
+    \bar R^T_k
+    &=
+    \sum_{j\in\mathcal J_T}p^T_jR^T_{j,k},
+    \\
+    k^\star_{\mathrm{static}}
+    &\in
+    \argmin_{k\in\Kcal}\bar R^T_k,
+    &
+    R^T_{\mathrm{orc}}
+    &=
+    \sum_{j\in\mathcal J_T}p^T_j\min_{k\in\Kcal}R^T_{j,k},
+    \\
+    \mathcal G_T
+    &=
+    \min_{k\in\Kcal}\bar R^T_k-R^T_{\mathrm{orc}} .
+\end{aligned}
+\end{equation}
+
+The oracle is infeasible because state-specific target risks are unknown when decisions are made. The static benchmark is feasible in principle but ignores the state. The gain \(\mathcal G_T\) depends on the empirical environment, the target criterion, the method menu, and the state partition. It measures the population reduction in target risk obtained by allowing the best method to vary across states.
+
+\begin{lemma}[State-dependent gain]
+\label{lem:state-dependent-gain}
+The gain \(\mathcal G_T\) in \eqref{eq:oracle-static-gain} has the following properties.
+\begin{enumerate}[label=(\alph*), leftmargin=*]
+    \item \(\mathcal G_T\geq0\).
+    \item \(\mathcal G_T=0\) if and only if a common target-optimal method exists across all states in \(\mathcal J_T\).
+    \item If no single method is target-optimal in every state in \(\mathcal J_T\), then \(\mathcal G_T>0\).
+\end{enumerate}
+\end{lemma}
+
+Lemma~\ref{lem:state-dependent-gain} interprets \(\mathcal G_T\). The gain is nonnegative because the oracle can reproduce any static method state by state. It is zero exactly when the same method is target-optimal in every target-relevant state. In that case, state-dependent selection has no population benefit relative to the best static method. A positive gain is therefore necessary for useful state-dependent selection, but feasible dominance over the static benchmark also requires the gain to cover learning, delay, dependence, mismatch, and initialization costs.
+
+\subsection{Sequential learning and target regret}
+
+The previous subsection defined the target selector as a population object. The risks in \eqref{eq:state-risks} are unknown at the decision date. At each batch, the selection rule can use only validation losses that have already arrived. The sequential problem is therefore an estimation problem with delayed and possibly dependent feedback: state-method validation risks are estimated from the arrived archive and then used to choose methods for future decision units.
+
+At the beginning of batch \(r\), three sets define the arrived archive:
+\begin{equation}
+\label{eq:arrived-archive}
+\begin{aligned}
+    \mathcal P_r&=\{(u,b):1\leq b<r,\ u\in\Ucal_b\},
+    \\
+    \mathcal W_r&=\{(u,b)\in\mathcal P_r:V_{u,b}=1,\ b+D_{u,b}<r\},
+    \\
+    \mathcal H_r(j,k)&=
+    \{(u,b)\in\mathcal W_r:G_{u,b}=j,\ k\in\Kcal^V_{u,b}\},
+    \qquad
+    n_r(j,k)=|\mathcal H_r(j,k)| .
+\end{aligned}
+\end{equation}
+The set \(\mathcal P_r\) contains past decisions. The set \(\mathcal W_r\) contains past decisions whose validation signals have arrived before the batch-\(r\) decision. The strict inequality \(b+D_{u,b}<r\) fixes this dating convention. If an application treats releases dated \(r\) as available before the batch-\(r\) decision, the condition can be replaced by \(b+D_{u,b}\leq r\) without changing the arguments. The set \(\mathcal H_r(j,k)\) is the state-method validation sample used to estimate \(R^V_{j,k}\). Delay reduces \(\mathcal W_r\), and partial feedback reduces \(\mathcal H_r(j,k)\). Under delayed full validation, \(\Kcal^V_{u,b}=\Kcal\), so each arrived validation record can be used to score all candidate methods.
+
+For state-method cells with \(n_r(j,k)>0\), and for states in which all method risks are defined, set
+\begin{equation}
+\label{eq:empirical-risk-selector}
+\begin{aligned}
+    \widehat R^V_{r,j,k}
+    &=
+    \frac{1}{n_r(j,k)}
+    \sum_{(u,b)\in\mathcal H_r(j,k)}
+    \ell^V_{u,b}(k),
+    \\
+    \widehat\pi_r(j)
+    &\in
+    \argmin_{k\in\Kcal}\widehat R^V_{r,j,k}.
+\end{aligned}
+\end{equation}
+The estimator \(\widehat R^V_{r,j,k}\) uses only validation information that has arrived before batch \(r\). The selector \(\widehat\pi_r(j)\) is the empirical state-to-method rule obtained by minimizing these validation-risk estimates.
+
+The empirical selector is used only after each target-relevant state-method cell has enough arrived observations. Let \(m_B\geq1\) be an initialization threshold and define
+\begin{equation*}
+    I_r=
+    \1\!\left\{
+    \min_{j\in\mathcal J_T}\min_{k\in\Kcal} n_r(j,k)\geq m_B
+    \right\} .
+\end{equation*}
+When \(I_r=1\), the rule uses \(\widehat\pi_r\). When \(I_r=0\), it uses a prespecified feasible initialization or exploration rule. This convention separates the cost of decisions made before the validation archive is informative from the cost of estimating risks after initialization.
+
+The next condition summarizes the sampling information in the arrived validation archive. It is stated in terms of an effective sample size because the raw number of validation records can overstate information when records are serially dependent, cross-sectionally dependent, clustered by release date, or generated by repeated completions of related panel cells.
+
+\begin{assumption}[Effective validation concentration]
+\label{ass:effective-concentration}
+Let \(\mathcal I_B=\{r\leq B:I_r=1\}\) be the set of initialized batches. The validation stream satisfies the following conditions.
+\begin{enumerate}[label=(\alph*), leftmargin=*]
+    \item For each initialized batch, state, and method, there exists an effective sample size \(n^{\mathrm{eff}}_r(j,k)\leq n_r(j,k)\). Let \(\underline n^{\mathrm{eff}}_B\) be the minimum of \(n^{\mathrm{eff}}_r(j,k)\) over \(r\in\mathcal I_B\), \(j\in\mathcal J_T\), and \(k\in\Kcal\), with the convention \(\underline n^{\mathrm{eff}}_B=1\) if \(\mathcal I_B\) is empty.
+    \item There exists a constant \(C<\infty\) such that, for every \(\delta\in(0,1)\), with probability at least \(1-\delta\),
+    \begin{equation}
+    \label{eq:effective-concentration}
+        \sup_{r\in\mathcal I_B}
+        \sup_{j\in\mathcal J_T}
+        \sup_{k\in\Kcal}
+        \left|\widehat R^V_{r,j,k}-R^V_{j,k}\right|
+        \leq
+        C
+        \sqrt{
+        \frac{\log(JKB/\delta)}{\underline n^{\mathrm{eff}}_B}
+        } .
+    \end{equation}
+    If \(\mathcal I_B\) is empty, the supremum is interpreted as zero.
+\end{enumerate}
+\end{assumption}
+
+Assumption~\ref{ass:effective-concentration} is the learning condition. If no batch is initialized, suprema over \(\mathcal I_B\) are empty and the empirical selector is never used. Part (a) records the information available for each initialized state-method cell after delay, dependence, and feedback sparsity. The effective sample size can be smaller than the raw count because dependent validation records carry less information than independent records. Part (b) imposes a uniform approximation of empirical validation risks to population validation risks over initialized batches, target-relevant states, and methods. The logarithmic factor reflects simultaneous control over the finite state-method-time collection. The usable information in the validation archive is summarized by \(\underline n^{\mathrm{eff}}_B\). Bounds of this form are high-level but standard in dependent-array arguments; under weak-dependence or mixing conditions, Bernstein-type inequalities can deliver the same rate with \(\underline n^{\mathrm{eff}}_B\) interpreted as a raw validation count adjusted for an effective dependence or block length \citep{MerlevedePeligradRio2011}.
+
+The first formal learning step is an empirical-risk comparison. Uniformly accurate validation-risk estimates imply that the empirical minimizer has small validation excess risk.
+
+\begin{lemma}[Empirical validation excess risk]
+\label{lem:empirical-validation-risk}
+Fix an initialized batch \(r\in\mathcal I_B\). Suppose that, for some \(\varepsilon_r\geq0\),
+\begin{equation*}
+    \sup_{j\in\mathcal J_T}\sup_{k\in\Kcal}
+    \left|\widehat R^V_{r,j,k}-R^V_{j,k}\right|
+    \leq \varepsilon_r .
+\end{equation*}
+Then, for every \(j\in\mathcal J_T\), the empirical selector has validation excess risk bounded by
+\begin{equation*}
+    \Delta^V_{j,\widehat\pi_r(j)}\leq 2\varepsilon_r .
+\end{equation*}
+On the event in Assumption~\ref{ass:effective-concentration}, this holds uniformly over initialized batches with
+\begin{equation}
+\label{eq:epsilon-B}
+    \varepsilon_B
+    =
+    C
+    \sqrt{
+    \frac{\log(JKB/\delta)}{\underline n^{\mathrm{eff}}_B}
+    } .
+\end{equation}
+\end{lemma}
+
+Lemma~\ref{lem:empirical-validation-risk} translates validation-risk estimation error into validation excess risk. The factor two is the standard cost of comparing an empirical minimizer with a population minimizer. The lemma concerns validation risk only. Target interpretation requires the validation-target link in Assumption~\ref{ass:validation-target-link}.
+
+Combining Lemma~\ref{lem:empirical-validation-risk} with Assumption~\ref{ass:validation-target-link} gives the target-risk consequence of learning from validation feedback.
+
+\begin{proposition}[Risk and selector consistency]
+\label{prop:risk-consistency}
+Suppose Assumptions~\ref{ass:validation-target-link} and \ref{ass:effective-concentration} hold. Then the following statements hold.
+\begin{enumerate}[label=(\alph*), leftmargin=*]
+    \item On the event in Assumption~\ref{ass:effective-concentration}, the initialized empirical selector satisfies
+    \begin{equation}
+    \label{eq:selector-risk-bound}
+        \sup_{r\in\mathcal I_B}
+        \sup_{j\in\mathcal J_T}
+        \Delta^T_{j,\widehat\pi_r(j)}
+        \leq
+        2\Lambda\varepsilon_B+\eta_B .
+    \end{equation}
+    \item If \(\eta_B=o(1)\) and \(\log(JKB)/\underline n^{\mathrm{eff}}_B=o_p(1)\), then
+    \begin{equation}
+    \label{eq:selector-risk-consistency}
+        \sup_{r\in\mathcal I_B}
+        \sup_{j\in\mathcal J_T}
+        \Delta^T_{j,\widehat\pi_r(j)}
+        =o_p(1) .
+    \end{equation}
+    \item If the rate conditions in part (b) hold and, in addition, target risks are separated away from the target-optimal set--there exists \(\gamma>0\) such that \(\Delta^T_{j,k}\geq\gamma\) for every \(j\in\mathcal J_T\) and every \(k\notin\argmin_{m\in\Kcal}R^T_{j,m}\)--then
+    \begin{equation}
+    \label{eq:selector-exact-recovery}
+        \Prb\!\left\{
+        \widehat\pi_r(j)\in\argmin_{k\in\Kcal}R^T_{j,k}
+        \text{ for all } r\in\mathcal I_B,\ j\in\mathcal J_T
+        \right\}
+        \to1 .
+    \end{equation}
+\end{enumerate}
+\end{proposition}
+
+Proposition~\ref{prop:risk-consistency} establishes three key results. Part (a) is a finite-sample target excess-risk bound for initialized decisions. The bound contains validation-risk estimation error, scaled by \(\Lambda\), and residual validation-target mismatch \(\eta_B\). Part (b) gives risk consistency when the bridge error vanishes and the effective validation sample grows fast enough. Part (c) gives exact selector recovery under an additional margin condition. The margin condition is needed because the identity of the best method is unstable when two methods have nearly identical target risk.
+
+The distinction between risk consistency and exact selector recovery is important for interpretation. Selecting a non-oracle method has little economic cost when its target risk is nearly identical to the oracle risk. The regret analysis therefore focuses on risk rather than exact method labels.
+
+We now aggregate statewise target excess risks over the target population. For a feasible rule \(\pi=\{\pi_r\}_{r=1}^B\), define population target pseudo-regret relative to the oracle in \eqref{eq:oracle-static-gain} as
+\begin{equation}
+\label{eq:target-regret}
+    \mathcal R^T_B(\pi)
+    =
+    \sum_{r=1}^{B}\sum_{u\in\Ucal_r}
+    T_{u,r}
+    \left\{
+    R^T_{G_{u,r},\pi_r(G_{u,r})}
+    -
+    R^T_{G_{u,r},\pi_T^\star(G_{u,r})}
+    \right\} .
+\end{equation}
+This pseudo-regret is defined in terms of population target risks, not realized losses observed at the decision date. It measures the target-risk cost of using a feasible real-time rule instead of the target oracle.
+
+Let
+\begin{equation*}
+    M^T_B=\sum_{r=1}^{B}\sum_{u\in\Ucal_r}T_{u,r},
+    \qquad
+    M^0_B=\sum_{r=1}^{B}\sum_{u\in\Ucal_r}T_{u,r}(1-I_r) .
+\end{equation*}
+The first quantity is the target mass over the evaluation horizon. The second is the target mass of decisions made before initialization. The next boundedness condition controls these uninitialized decisions.
+
+\begin{assumption}[Bounded target excess and nondegenerate target mass]
+\label{ass:bounded-target-excess}
+The target criterion satisfies the following conditions.
+\begin{enumerate}[label=(\alph*), leftmargin=*]
+    \item There exists \(\bar L<\infty\) such that \(0\leq \Delta^T_{j,k}\leq \bar L\) for every \(j\in\mathcal J_T\) and every \(k\in\Kcal\).
+    \item The total target mass satisfies \(M^T_B>0\) for every \(B\) under consideration. If \(M^T_B\) is random, the finite-sample bound is understood on the event \(M^T_B>0\), and the asymptotic statement requires this event to have probability approaching one.
+\end{enumerate}
+\end{assumption}
+
+Assumption~\ref{ass:bounded-target-excess} gives the uniform target-excess bound used to control decisions made before initialization. With squared losses, moment or truncation conditions could play the same role. Part (b) ensures that average regret has a nonzero denominator.
+
+Theorem~\ref{thm:oracle-approximation} gives the cost side of the gain-cost comparison. The gain is the oracle-static quantity \(\mathcal G_T\) in \eqref{eq:oracle-static-gain}; the theorem bounds the average target-risk cost of using the feasible sequential rule rather than the target oracle.
+
+\begin{theorem}[Target pseudo-regret under delayed validation]
+\label{thm:oracle-approximation}
+Suppose Assumptions~\ref{ass:rt-feasibility}--\ref{ass:bounded-target-excess} hold. Let \(\widehat\pi^{\mathrm{seq}}\) be the feasible \(\Kcal\)-valued rule that uses the empirical selector in \eqref{eq:empirical-risk-selector} on initialized batches and a prespecified \(\Fcal_r\)-measurable initialization rule otherwise. Then the following statements hold.
+\begin{enumerate}[label=(\alph*), leftmargin=*]
+    \item For every \(\delta\in(0,1)\), on the event \(M^T_B>0\), the following bound holds on the concentration event in Assumption~\ref{ass:effective-concentration}, which has probability at least \(1-\delta\):
+    \begin{equation}
+    \label{eq:oracle-approximation-bound}
+        \frac{\mathcal R^T_B(\widehat\pi^{\mathrm{seq}})}{M^T_B}
+        \leq
+        \eta_B
+        +
+        2\Lambda C
+        \sqrt{
+            \frac{\log(JKB/\delta)}{\underline n^{\mathrm{eff}}_B}
+        }
+        +
+        \bar L\frac{M^0_B}{M^T_B} .
+    \end{equation}
+    \item If
+    \begin{equation}
+    \label{eq:oracle-approximation-rates}
+        \eta_B=o(1),
+        \qquad
+        \frac{\log(JKB)}{\underline n^{\mathrm{eff}}_B}=o_p(1),
+        \qquad
+        \frac{M^0_B}{M^T_B}=o_p(1),
+    \end{equation}
+    then, with the average regret interpreted on the nonempty-target event when \(M^T_B\) is random,
+    \begin{equation}
+    \label{eq:oracle-approximation-convergence}
+        \frac{\mathcal R^T_B(\widehat\pi^{\mathrm{seq}})}{M^T_B}=o_p(1) .
+    \end{equation}
+\end{enumerate}
+\end{theorem}
+
+The right-hand side of \eqref{eq:oracle-approximation-bound} distinguishes three costs. The term \(\eta_B\) is the validation-target mismatch. It is an identification cost: it is zero when validation excess risk exactly controls target excess risk, as in aligned delayed-release validation for the local release criterion. If \(\eta_B\) has a nonzero limit, the limiting gap is due to the validation design rather than to sequential-learning error. The square-root term is the learning cost. It is the cost of estimating state-method validation risks from the arrived archive, and it increases when delay, dependence, or sparse feedback lowers the effective validation sample size. The last term, \(\bar L M^0_B/M^T_B\), is the initialization cost. It is the contribution of target-relevant decisions made before enough validation feedback has arrived to use the empirical selector.
+
+Combining \eqref{eq:oracle-approximation-bound} with the population gain \(\mathcal G_T\) in \eqref{eq:oracle-static-gain} gives the gain-cost comparison. The oracle-static gain measures the value available from state-dependent method choice. The bound identifies the costs that a feasible selector must overcome to approach that oracle: validation-target mismatch, limited effective validation information, and initialization under delay. Corollary~\ref{cor:static-dominance} below turns this comparison into an exact statement.
+
+The four designs in Section~\ref{sec:taxonomy} correspond to different interpretations of these terms. In delayed releases with local first-reveal loss, validation-target mismatch vanishes. In mixed-frequency settings, the validation object may be an aggregate or restriction; the design is aligned only when that object is also the target criterion. In evaluable missingness, the first term is governed by transportability from validation losses to target losses. In completed-panel evaluation, local validation losses are informative for a downstream target object only under a substantive bridge condition.
+
+The gain-cost comparison can be made exact. Theorem~\ref{thm:oracle-approximation} controls the distance between the feasible rule and the oracle, whereas the comparison of applied interest is against the best static method. The bridge between the two is the realized-frequency counterpart of the gain in \eqref{eq:oracle-static-gain}. For any feasible rule \(\pi=\{\pi_r\}_{r=1}^B\), let
+\begin{equation}
+\label{eq:realized-risk-and-gain}
+\mathcal A^T_B(\pi)
+=\frac{1}{M^T_B}\sum_{r=1}^{B}\sum_{u\in\Ucal_r}T_{u,r}\,R^T_{G_{u,r},\pi_r(G_{u,r})},
+\qquad
+\overline{\mathcal G}_B
+=\min_{k\in\Kcal}\mathcal A^T_B(k)-\mathcal A^T_B(\pi^\star_T),
+\end{equation}
+where a fixed method \(k\in\Kcal\) is identified with the constant rule \(\pi_r\equiv k\). The quantity \(\mathcal A^T_B(\pi)\) is the average target risk realized by \(\pi\) over target-relevant decisions, and \(\overline{\mathcal G}_B\) is the state-dependent gain evaluated at the states actually visited: the exact analogue of \(\mathcal G_T\), with population weights replaced by realized target-state frequencies.
+
+\begin{corollary}[Gain-cost criterion for dominance over the best static method]
+\label{cor:static-dominance}
+Suppose Assumptions~\ref{ass:rt-feasibility}--\ref{ass:bounded-target-excess} hold, and interpret all statements on the event \(M^T_B>0\). Then the following statements hold.
+\begin{enumerate}[label=(\alph*), leftmargin=*]
+    \item For every feasible rule \(\pi\),
+    \begin{equation}
+    \label{eq:static-gap-identity}
+        \mathcal A^T_B(\pi)-\min_{k\in\Kcal}\mathcal A^T_B(k)
+        =\frac{\mathcal R^T_B(\pi)}{M^T_B}-\overline{\mathcal G}_B ,
+    \end{equation}
+    and \(\overline{\mathcal G}_B\geq 0\), with \(\overline{\mathcal G}_B=0\) if and only if a single method attains \(\min_{m\in\Kcal}R^T_{j,m}\) in every state \(j\) visited by target-relevant decisions up to horizon \(B\).
+    \item For every \(\delta\in(0,1)\), on the concentration event in Assumption~\ref{ass:effective-concentration}, which has probability at least \(1-\delta\),
+    \begin{equation}
+    \label{eq:static-gap-bound}
+        \mathcal A^T_B(\widehat\pi^{\mathrm{seq}})-\min_{k\in\Kcal}\mathcal A^T_B(k)
+        \;\leq\;
+        \eta_B
+        +2\Lambda C\sqrt{\frac{\log(JKB/\delta)}{\underline n^{\mathrm{eff}}_B}}
+        +\bar L\,\frac{M^0_B}{M^T_B}
+        \;-\;\overline{\mathcal G}_B .
+    \end{equation}
+    In particular, \(\widehat\pi^{\mathrm{seq}}\) has strictly smaller average target risk than every static method whenever \(\overline{\mathcal G}_B\) exceeds the sum of the mismatch, learning, and initialization costs.
+    \item Under the rate conditions \eqref{eq:oracle-approximation-rates},
+    \begin{equation*}
+        \max\Big\{\mathcal A^T_B(\widehat\pi^{\mathrm{seq}})-\min_{k\in\Kcal}\mathcal A^T_B(k),\,0\Big\}=o_p(1);
+    \end{equation*}
+    if, in addition, there exists \(g>0\) such that \(\Prb\{\overline{\mathcal G}_B\geq g\}\to 1\), then
+    \begin{equation*}
+        \Prb\Big\{\mathcal A^T_B(\widehat\pi^{\mathrm{seq}})\leq\min_{k\in\Kcal}\mathcal A^T_B(k)-g/2\Big\}\to 1 .
+    \end{equation*}
+    \item If the target risks in \eqref{eq:state-risks} do not depend on \(B\) and the realized target-state frequencies converge in probability to the weights \(p^T_j\), then \(\overline{\mathcal G}_B\to_p\mathcal G_T\), and the condition in part (c) holds for every \(0<g<\mathcal G_T\) whenever \(\mathcal G_T>0\).
+\end{enumerate}
+\end{corollary}
+
+Corollary~\ref{cor:static-dominance} is the formal counterpart of the paper's organizing message. Part (a) decomposes the average gap to the best static method exactly into a learning component, the oracle pseudo-regret per target decision, minus the realized state-dependent gain. Part (b) converts Theorem~\ref{thm:oracle-approximation} into an operational dominance criterion: sequential completion pays exactly when the realized gain covers mismatch, learning, and initialization. Part (c) adds an insurance property: even when the gain is negligible, the feasible rule is asymptotically no worse than the best static method, so the cost of adopting sequential completion is bounded by the learning terms. Part (d) connects the realized gain to its population counterpart. The Monte Carlo decomposition in Section~\ref{sec:montecarlo} reports precisely these objects: the gain \(G\), the per-decision regret, and the gap on the left-hand side of \eqref{eq:static-gap-identity}.
+
+\section{Real-Time Panel Completion}
+\label{sec:completion}
+\label{sec:specialization}
+
+This section studies real-time panel completion. The generic batch index \(b\) is now a data vintage, denoted by \(\tau\). At vintage \(\tau\), the investigator observes the released panel, fills the unreleased entries required for the current empirical task, and later observes validation values when releases arrive. Candidate methods are fixed vintage-feasible completion rules.
+
+We consider two evaluation layers. Local release validation scores each candidate method when the completed cell is later released; for this criterion, decision, validation, and local target populations coincide. Target-object evaluation scores an object built from the completed vintage, such as a factor estimate, predictor, or nowcast, and may rank methods differently. The section defines the real-time experiment, states the release-validation learning problem, and gives large-sample approximations for release-risk estimates and smooth functions of those risks. Proofs are collected in Appendix~\ref{app:proofs}.
+
+The setting is connected to real-time macroeconomic data, vintage evaluation, nowcasting with partially observed panels, and mixed-frequency models \citep{CroushoreStark2001,McCrackenNg2016,GiannoneReichlinSmall2008,BanburaModugno2014,JungbackerKoopmanWel2011,MarianoMurasawa2003,BaiGhyselsWright2013,AnkargrenJoneus2021}.
+
+\subsection{The real-time completion experiment}
+
+Let \(\tau=1,\ldots,B\) index data vintages. A panel cell is indexed by a unit \(i=1,\ldots,N\) and a reference date \(t\). Let \(Y_{it}\) denote the validation value fixed by the evaluation design. In revision-prone data this can be the first release or another prespecified vintage value. Let \(r_{it}\) denote the first vintage at which that validation value is available. Both the validation value and its first availability date are fixed before losses are computed.
+
+At vintage \(\tau\), the investigator observes the released part of the panel and completes the entries required by the current empirical task but not yet released. Let \(\mathcal C_\tau\) be the collection of cells required to construct the current vintage. The real-time frontier is
+\begin{equation}
+\label{eq:rt-frontier}
+    \Ucal^Y_\tau
+    =
+    \{u=(i,t,\tau):(i,t)\in\mathcal C_\tau,\ r_{it}>\tau\} .
+\end{equation}
+Equation~\eqref{eq:rt-frontier} defines the real-time decision population. A frontier observation is indexed both by the calendar cell and by the vintage at which it is completed: \(u=(i,t,\tau)\). The same calendar cell may be completed at different vintages under different information sets, observation patterns, and panel states. Real-time completion is therefore a sequence of vintage-specific decisions, not a retrospective missing-value exercise.
+
+Write \(r(u)=r_{it}\). For the local release-validated criterion considered below,
+\begin{equation}
+\label{eq:rt-section3-map}
+\begin{aligned}
+    D^Y_u&=
+    \begin{cases}
+        r(u)-\tau, & r(u)<\infty,\\
+        +\infty, & r(u)=\infty,
+    \end{cases}
+    \\
+    V^Y_u&=T^Y_u=\1\{r(u)<\infty\},
+    \qquad
+    \Kcal^V_u=\Kcal \text{ on } \{V^Y_u=1\} .
+\end{aligned}
+\end{equation}
+This mapping embeds local release validation in Section~\ref{sec:selection}. Conditional on eventual release, the same frontier decision supplies the validation loss and the local target loss. Because the later release can score every stored or reproducibly reconstructed candidate completion, feedback is delayed full validation rather than selected-arm feedback. The alignment concerns the local release criterion only; it does not make local release accuracy the downstream objective.
+
+For each candidate method \(k\in\Kcal\), define the vintage-feasible completion
+\begin{equation}
+\label{eq:rt-completion-rule}
+    \widehat Y^{(k)}_u
+    \equiv
+    \widehat Y^{(k)}_{it|\tau}
+    =q_k(u;\Fcal_\tau),
+    \qquad
+    A_u=\pi_\tau(G_u),
+    \qquad
+    \widehat Y^{(\pi)}_u=\widehat Y^{(A_u)}_u .
+\end{equation}
+The map \(q_k\) may be a local autoregression, factor-based rule, state-space filter, matrix-completion method, mixed-frequency rule, or other vintage-feasible completion method. The real-time measurability restriction is that \(q_k\), the state \(X_u\), the finite state label \(G_u=g(X_u)\), and the selected method \(A_u\) are functions of \(\Fcal_\tau\). Observed cells are kept at their released values. Frontier cells in \(\Ucal^Y_\tau\) are filled according to \eqref{eq:rt-completion-rule}, producing a completed vintage \(\widehat Y^{(\pi)}_\tau\).
+
+The state is a vintage-available summary of panel conditions that may affect the relative performance of the candidate methods. Natural components include release delay, time since the last observed value of series \(i\), local volatility or persistence, cross-sectional coverage at reference date \(t\), factor strength or reconstruction error computed from the available panel, and release-calendar indicators. A finite state partition reduces learning costs and makes state visitation transparent while preserving economically meaningful heterogeneity.
+
+\begin{assumption}[Real-time completion design]
+\label{ass:rt-environment}
+The real-time completion design satisfies the following restrictions.
+\begin{enumerate}[label=(\alph*), leftmargin=*]
+    \item The information set \(\Fcal_\tau\) contains all releases available at vintage \(\tau\), the current observation pattern, release-calendar information used by the analyst, and validation losses that have already arrived.
+    \item For every frontier decision unit \(u=(i,t,\tau)\in\Ucal^Y_\tau\) and every \(k\in\Kcal\), the candidate completion \(\widehat Y^{(k)}_u\), the state \(X_u\), the finite state label \(G_u\), and the selected method \(A_u\) are \(\Fcal_\tau\)-measurable.
+    \item The candidate set \(\Kcal\) and the finite state-label space \(\{1,\ldots,J\}\) are fixed before sequential learning begins.
+    \item Candidate completions are stored at the decision date, or are reproducibly reconstructed from archived vintage information without using the later validation value. When \(Y_{it}\) is released, the local losses of all candidate methods can be reconstructed.
+\end{enumerate}
+\end{assumption}
+
+Assumption~\ref{ass:rt-environment} fixes the real-time experiment. Part (a) defines the vintage information set. Part (b) imposes real-time measurability for candidate completions, states, and method choices. Part (c) fixes the method menu and the state partition before evaluation-period learning. Any calibration of these objects uses pre-evaluation information or is treated as a separate design stage. Part (d) is the full-validation requirement: after release, every candidate completion produced at the decision date, or reconstructed from the archived vintage, can be scored. Observability comes from delayed full validation, while learning still requires enough release-validated observations in each state.
+
+\subsection{Release validation and the selection estimator}
+
+For a frontier decision unit \(u=(i,t,\tau)\), define the local release-validated loss and risk by
+\begin{equation}
+\label{eq:rt-local-risk}
+\begin{aligned}
+    \ell^Y_u(k)&\equiv \ell^Y_{it|\tau}(k)
+    =L_Y\!\left(\widehat Y^{(k)}_{it|\tau},Y_{it}\right),
+    \\
+    R^Y_{j,k}&=\E\!\left[\ell^Y_u(k)\mid G_u=j,\ V^Y_u=1\right],
+    \\
+    \Delta^Y_{j,k}&=R^Y_{j,k}-\min_{m\in\Kcal}R^Y_{j,m} .
+\end{aligned}
+\end{equation}
+The baseline loss is squared error, \(L_Y(\widehat y,y)=(\widehat y-y)^2\), but the arguments require only a well-defined local loss. The event \(V^Y_u=1\) restricts attention to frontier decisions that eventually generate release validation. Frontier units that never generate such feedback fall under the validation-population problem described in Sections~\ref{sec:taxonomy} and~\ref{sec:selection}.
+
+\begin{proposition}[Release-validation equivalence]
+\label{prop:rt-release-alignment}
+Suppose Assumption~\ref{ass:rt-environment} holds and consider the local release-validated criterion in \eqref{eq:rt-local-risk}. For every release-validated frontier decision unit and every \(k\in\Kcal\), the validation and local target losses coincide with \(\ell^Y_u(k)\), the validation and local target populations coincide with the release-validated population, and the observable method set is the full candidate set \(\Kcal\).
+\end{proposition}
+
+For the local release-validation layer, Proposition~\ref{prop:rt-release-alignment} sets \(\Lambda=1\) and \(\eta_B=0\). The release archive identifies the local target-optimal selector for the cellwise criterion. The remaining problem is estimation under delay, dependence, and uneven state visitation, and the downstream target-object criterion is treated separately below.
+
+The learning rule is the release-validation analogue of Section~\ref{sec:selection}. The decision-date state is \(G_u\), the selected method is the completion class, and the delayed full-validation feedback is the vector \(\{\ell^Y_u(k):k\in\Kcal\}\) reconstructed after \(Y_{it}\) is released. Since the same release record scores all methods, the archive is indexed by state rather than by state-method pairs. Let
+\begin{equation}
+\label{eq:rt-archive}
+\begin{aligned}
+    \mathcal W^Y_\tau
+    &=
+    \{u\in\cup_{\nu<\tau}\Ucal^Y_\nu:r(u)<\tau\},
+    \\
+    \mathcal H^Y_\tau(j)&=\{u\in\mathcal W^Y_\tau:G_u=j\},
+    \qquad
+    n^Y_\tau(j)=|\mathcal H^Y_\tau(j)| .
+\end{aligned}
+\end{equation}
+The archive \(\mathcal W^Y_\tau\) contains previous frontier decisions whose validation values are available before the vintage-\(\tau\) decision. The set \(\mathcal H^Y_\tau(j)\) keeps the release records in state \(j\). If releases dated \(\tau\) are available before the vintage-\(\tau\) decision, the condition \(r(u)<\tau\) can be replaced by \(r(u)\leq\tau\); only the dating convention changes.
+
+When \(n^Y_\tau(j)>0\), define
+\begin{equation}
+\label{eq:rt-empirical-risk}
+    \widehat R^Y_{\tau,j,k}
+    =
+    \frac{1}{n^Y_\tau(j)}
+    \sum_{u\in\mathcal H^Y_\tau(j)}\ell^Y_u(k),
+    \qquad
+    \widehat\pi^Y_\tau(j)
+    \in
+    \argmin_{k\in\Kcal}\widehat R^Y_{\tau,j,k} .
+\end{equation}
+The first object estimates the state-specific release risk of a fixed method. The second is the empirical state-to-method rule used at the frontier. Let \(\mathcal J_Y\) be the set of states with positive probability in the release-validated population. Given an initialization threshold \(m_B\), define \(I^Y_\tau=1\) if \(n^Y_\tau(j)\geq m_B\) for all \(j\in\mathcal J_Y\), and \(I^Y_\tau=0\) otherwise. On initialized vintages the rule uses \(\widehat\pi^Y_\tau\); before initialization it uses a prespecified feasible rule. For uniform statements over initialized vintages, \(m_B\) may grow with the evaluation horizon. Initialization must last long enough to populate the state archive, while the mass of uninitialized decisions must become negligible.
+
+The following concentration condition is the release-validation counterpart of Assumption~\ref{ass:effective-concentration}. It gives the uniform approximation used for oracle regret. The distributional condition used for normal approximation is stated separately in Assumption~\ref{ass:rt-fclt}.
+
+\begin{assumption}[Release-validation concentration]
+\label{ass:rt-concentration}
+There exist constants \(C_Y<\infty\) and effective sample sizes \(n^{Y,\mathrm{eff}}_\tau(j)\leq n^Y_\tau(j)\) such that, for every \(\delta\in(0,1)\), with probability at least \(1-\delta\),
+\begin{equation}
+\label{eq:rt-concentration}
+    \sup_{\tau:I^Y_\tau=1}
+    \sup_{j\in\mathcal J_Y}
+    \sup_{k\in\Kcal}
+    \left|\widehat R^Y_{\tau,j,k}-R^Y_{j,k}\right|
+    \leq
+    C_Y
+    \sqrt{\frac{\log(JKB/\delta)}{\underline n^{Y,\mathrm{eff}}_B}},
+\end{equation}
+where \(\underline n^{Y,\mathrm{eff}}_B\) is the minimum of \(n^{Y,\mathrm{eff}}_\tau(j)\) over initialized vintages and release-relevant states, with the convention that it equals one if no vintage has initialized. If no vintage has initialized, the supremum is interpreted as zero.
+\end{assumption}
+
+Assumption~\ref{ass:rt-concentration} summarizes the sampling information in the release archive. If no vintage is initialized, statements involving \(\widehat\pi^Y_\tau\) are vacuous because the rule remains in its prespecified initialization phase. The supremum is uniform over initialized vintages, release-relevant states, and methods. Delay lowers the number of available release records. Dependence lowers their information content. Repeated completions of the same cell, common shocks, factor structure, and release-date clustering should therefore be reflected in \(\underline n^{Y,\mathrm{eff}}_B\). As in Assumption~\ref{ass:effective-concentration}, this is a high-level concentration requirement. Under standard weak-dependence or mixing-array conditions, Bernstein-type bounds justify the same representation with \(\underline n^{Y,\mathrm{eff}}_B\) proportional to the number of release records divided by an effective dependence length \citep{MerlevedePeligradRio2011}.
+
+\begin{proposition}[Release-risk and selector consistency]
+\label{prop:rt-selector-consistency}
+Suppose Assumptions~\ref{ass:rt-environment} and~\ref{ass:rt-concentration} hold. Let
+\begin{equation}
+\label{eq:rt-epsilon}
+    \varepsilon^Y_B
+    =
+    C_Y
+    \sqrt{\frac{\log(JKB/\delta)}{\underline n^{Y,\mathrm{eff}}_B}} .
+\end{equation}
+Then the following statements hold.
+\begin{enumerate}[label=(\alph*), leftmargin=*]
+    \item On the event in Assumption~\ref{ass:rt-concentration},
+    \begin{equation}
+    \label{eq:rt-selector-excess}
+        \sup_{\tau:I^Y_\tau=1}
+        \sup_{j\in\mathcal J_Y}
+        \Delta^Y_{j,\widehat\pi^Y_\tau(j)}
+        \leq 2\varepsilon^Y_B .
+    \end{equation}
+    \item If \(\log(JKB)/\underline n^{Y,\mathrm{eff}}_B=o_p(1)\), then the initialized rule is risk-consistent for the local release oracle:
+    \begin{equation}
+    \label{eq:rt-risk-consistency}
+        \sup_{\tau:I^Y_\tau=1}
+        \sup_{j\in\mathcal J_Y}
+        \Delta^Y_{j,\widehat\pi^Y_\tau(j)}=o_p(1).
+    \end{equation}
+    \item If the rate condition in part (b) holds and, in addition, there exists \(\gamma_Y>0\) such that \(\Delta^Y_{j,k}\geq\gamma_Y\) for every \(j\in\mathcal J_Y\) and every non-optimal method \(k\notin\argmin_{m\in\Kcal} R^Y_{j,m}\), then \(\widehat\pi^Y_\tau(j)\) is local-oracle optimal uniformly over initialized vintages and release-relevant states with probability approaching one.
+\end{enumerate}
+\end{proposition}
+
+Proposition~\ref{prop:rt-selector-consistency} is the release-validation learning result. All three parts rely on the real-time design and the release-validation concentration condition. Part (a) gives the finite-sample local release excess-risk bound. Part (b) gives risk consistency when the dependence-adjusted release archive grows fast enough. Part (c) adds a margin condition to turn risk consistency into exact recovery of the local oracle method. Exact recovery is stronger than risk consistency because the argmin map is discontinuous at ties. The release-array invariance principle introduced below is not needed for these selector-consistency statements; it is used for inference on release-risk estimates and smooth functionals.
+
+The local regret criterion aggregates local excess risk over release-validated frontier decisions:
+\begin{equation}
+\label{eq:rt-local-regret}
+    \mathcal R^Y_B(\pi)
+    =
+    \sum_{\tau=1}^{B}
+    \sum_{u\in\Ucal^Y_\tau}
+    V^Y_u
+    \left\{
+        R^Y_{G_u,\pi_\tau(G_u)}-\min_{m\in\Kcal}R^Y_{G_u,m}
+    \right\} .
+\end{equation}
+Let \(M^Y_B=\sum_{\tau=1}^{B}\sum_{u\in\Ucal^Y_\tau}V^Y_u\) be the release-validated target mass, and let \(M^{Y,0}_B=\sum_{\tau=1}^{B}\sum_{u\in\Ucal^Y_\tau}V^Y_u(1-I^Y_\tau)\) be the mass of release-validated decisions made before initialization.
+
+\begin{corollary}[Local oracle approximation for real-time completion]
+\label{cor:rt-local-regret}
+Suppose Assumptions~\ref{ass:rt-environment} and~\ref{ass:rt-concentration} hold, and suppose local release excess risks are uniformly bounded by \(\bar L_Y<\infty\). Let \(\widehat\pi^{Y}\) use \eqref{eq:rt-empirical-risk} on initialized vintages and a feasible initialization rule otherwise. Then, for every \(\delta\in(0,1)\), on the intersection of the concentration event in Assumption~\ref{ass:rt-concentration} and \(\{M^Y_B>0\}\),
+\begin{equation}
+\label{eq:rt-local-regret-bound}
+    \frac{\mathcal R^Y_B(\widehat\pi^Y)}{M^Y_B}
+    \leq
+    2C_Y
+    \sqrt{\frac{\log(JKB/\delta)}{\underline n^{Y,\mathrm{eff}}_B}}
+    +
+    \bar L_Y\frac{M^{Y,0}_B}{M^Y_B} .
+\end{equation}
+The concentration event has probability at least \(1-\delta\). Consequently, if
+\begin{equation*}
+    \frac{\log(JKB)}{\underline n^{Y,\mathrm{eff}}_B}=o_p(1),
+    \qquad
+    \frac{M^{Y,0}_B}{M^Y_B}=o_p(1),
+\end{equation*}
+and \(\Prb\{M^Y_B>0\}\to1\), then \(\mathcal R^Y_B(\widehat\pi^Y)/M^Y_B=o_p(1)\).
+\end{corollary}
+
+Corollary~\ref{cor:rt-local-regret} gives the local release-regret bound for real-time completion. Because release validation aligns validation and local target losses, the validation-target mismatch term is absent. The remaining terms are the cost of estimating state-specific release risks from a delayed and dependent archive and the cost of decisions made before the archive is sufficiently populated. Even in this aligned case, sequential selection need not dominate the best static completion rule in finite samples; that comparison depends on the local state-dependent gain relative to learning and initialization costs.
+
+\subsection{Limit theory, inference, and target-object loss}
+\label{subsec:rt-inference}
+
+The concentration condition in Assumption~\ref{ass:rt-concentration} is designed for oracle approximation. It controls the uniform error of release-risk estimates over initialized vintages. Inference concerns a different object: smooth empirical quantities computed from the release archive, such as state shares, state-method risks, risk differences, reweighted target risks, and gains from state-dependent selection. The selected method itself is an argmin object and is generally non-Gaussian at ties.
+
+The inferential argument is standard plug-in econometrics. In the delayed full-validation design, the archive of candidate losses is non-adaptive conditional on the stored vintage information: once a cell is released, every candidate method is scored on that cell. The sequential selector determines which completion is used at the decision date, but it does not determine which candidate losses enter the release-risk vector. A finite vector of release-validation moments then satisfies a central limit approximation. The moments are mapped into risks through a smooth ratio map. Smooth functionals of those risks follow by continuous mapping and the delta method. Exact recovery of the selected method is handled by consistency and margin conditions rather than by a normal approximation.
+
+Let \(N^Y_\tau=|\mathcal W^Y_\tau|\), and order the archive \(\mathcal W^Y_\tau\) chronologically by release vintage, with a fixed tie-breaking rule within a vintage. Write the ordered records as \(u_{\tau1},\ldots,u_{\tau N^Y_\tau}\). For each record define
+\begin{equation*}
+    Z^Y_{\tau\ell}
+    =
+    \left(
+        \{\1(G_{u_{\tau\ell}}=j)\}_{j\in\mathcal J_Y},
+        \{\1(G_{u_{\tau\ell}}=j)\ell^Y_{u_{\tau\ell}}(k)\}_{j\in\mathcal J_Y,k\in\Kcal}
+    \right)' .
+\end{equation*}
+Let \(\bar Z^Y_\tau=(N^Y_\tau)^{-1}\sum_{\ell=1}^{N^Y_\tau}Z^Y_{\tau\ell}\). The stable population mean is
+\begin{equation*}
+\begin{aligned}
+    \mu^Y
+    &=
+    \left(
+        \{p^Y_j\}_{j\in\mathcal J_Y},
+        \{m^Y_{j,k}\}_{j\in\mathcal J_Y,k\in\Kcal}
+    \right)' ,
+    \\
+    m^Y_{j,k}&=p^Y_jR^Y_{j,k},
+    \qquad
+    p^Y_j=\Prb\{G_u=j\mid V^Y_u=1\} .
+\end{aligned}
+\end{equation*}
+The moment vector records state membership and state-by-method loss sums. State-specific risks are ratios of these two components. Let \(\phi\) be the ratio map that sends \(\mu^Y\) into
+\begin{equation*}
+    \theta^Y
+    =
+    \phi(\mu^Y)
+    =
+    \left(
+        \{p^Y_j\}_{j\in\mathcal J_Y},
+        \{R^Y_{j,k}\}_{j\in\mathcal J_Y,k\in\Kcal}
+    \right)' .
+\end{equation*}
+The empirical counterpart is \(\widehat\theta^Y_\tau=\phi(\bar Z^Y_\tau)\), so the risk coordinates of \(\widehat\theta^Y_\tau\) are the release-risk estimators in \eqref{eq:rt-empirical-risk} whenever the relevant state shares are positive.
+
+The next assumption is used for inference on release-risk estimates and smooth functionals of those risks. It permits dependence and triangular-array drift by centering each row at its own mean and requiring the row-average mean to be close to the stable target \(\mu^Y\).
+
+\begin{assumption}[Release-array invariance principle]
+\label{ass:rt-fclt}
+The ordered release-validation array satisfies the following restrictions.
+\begin{enumerate}[label=(\alph*), leftmargin=*]
+    \item The archive size satisfies \(N^Y_\tau\to\infty\), and there exists \(\underline p_Y>0\) such that \(p^Y_j\geq\underline p_Y\) for every \(j\in\mathcal J_Y\).
+    \item Let \(\mu^Y_{\tau\ell}=\E[Z^Y_{\tau\ell}]\) and \(\bar\mu^Y_\tau=(N^Y_\tau)^{-1}\sum_{\ell=1}^{N^Y_\tau}\mu^Y_{\tau\ell}\). The row-average mean satisfies
+    \begin{equation}
+    \label{eq:rt-row-mean-stability}
+        \sqrt{N^Y_\tau}\left(\bar\mu^Y_\tau-\mu^Y\right)\to 0 .
+    \end{equation}
+    \item The centered partial-sum process satisfies the functional central limit theorem
+    \begin{equation}
+    \label{eq:rt-fclt}
+        \frac{1}{\sqrt{N^Y_\tau}}
+        \sum_{\ell=1}^{\lfloor N^Y_\tau s\rfloor}
+        (Z^Y_{\tau\ell}-\mu^Y_{\tau\ell})
+        \Rightarrow
+        \Omega^{Y,1/2}_\mu W(s)
+        \quad\text{in }D[0,1],
+    \end{equation}
+    where \(W\) is a standard Brownian motion of conformable dimension and \(\Omega^Y_\mu\) is finite.
+\end{enumerate}
+\end{assumption}
+
+Assumption~\ref{ass:rt-fclt} is an inferential condition, not a learning condition for the sequential rule. The selector-consistency and regret bounds above rely on concentration of empirical risks; the invariance principle below delivers asymptotic normality for fixed risk estimates, risk differences, reweighted risks, and gains. Part (a) requires the archive to grow and each release-relevant state to have positive limiting mass, so the ratio map is well behaved. Part (b) permits triangular-array drift in the release archive but makes it negligible at the \(\sqrt{N^Y_\tau}\) scale. Persistent drift in release-risk rankings would require a different stable target, for example by augmenting the state, restricting the evaluation window, or using a rolling-window target. Part (c) is the invariance principle for the centered release-validation moments. Cross-sectional dependence, repeated completions of the same cell, generated candidate completions, common shocks, and release-date clustering enter through \(\Omega^Y_\mu\). When validation records are clustered by release date, the same framework can be stated for normalized release-date cluster contributions, with \(N^Y_\tau\) denoting the number of clusters.
+
+\begin{assumption}[Long-run variance estimation]
+\label{ass:rt-lrv}
+There exists an estimator \(\widehat\Omega^Y_{\mu,\tau}\) such that \(\widehat\Omega^Y_{\mu,\tau}\to_p\Omega^Y_\mu\). For ordered weakly dependent release records this may be a heteroskedasticity-and-autocorrelation consistent estimator; for release-date clusters it may be a cluster long-run covariance estimator.
+\end{assumption}
+
+Assumption~\ref{ass:rt-lrv} is an inferential condition. After Assumption~\ref{ass:rt-fclt} supplies the limiting covariance matrix, Assumption~\ref{ass:rt-lrv} requires that the covariance be consistently estimable from the release archive. HAC consistency for weakly dependent records follows from conditions of the type studied by \citet{NeweyWest1987}, \citet{Andrews1991}, and \citet{deJongDavidson2000Econometrica}. Cluster covariance estimation for release-date clusters follows the large-cluster asymptotic theory of \citet{HansenLee2019}.
+
+The functional central limit theorem in Assumption~\ref{ass:rt-fclt}(c), evaluated at \(s=1\) and combined with the negligible-drift condition in part (b), gives
+\begin{equation}
+\label{eq:rt-sample-moment-clt}
+    \sqrt{N^Y_\tau}\left(\bar Z^Y_\tau-\mu^Y\right)
+    \Rightarrow
+    \mathcal N(0,\Omega^Y_\mu).
+\end{equation}
+This is a central limit theorem for release-validation moments, not for the selected method. The selected method is an argmin object and is handled by Proposition~\ref{prop:rt-selector-consistency}.
+
+Let \(D_\phi\) be the Jacobian of \(\phi\) at \(\mu^Y\), and define
+\begin{equation*}
+    \Omega^Y_\theta=D_\phi\Omega^Y_\mu D_\phi' .
+\end{equation*}
+The empirical map \(\widehat\theta^Y_\tau=\phi(\bar Z^Y_\tau)\) is evaluated on the event \(\min_{j\in\mathcal J_Y}\widehat p^Y_{\tau,j}>0\). Assumption~\ref{ass:rt-fclt}(a) implies that this event has probability approaching one.
+
+\begin{theorem}[Asymptotic normality of release-risk estimates]
+\label{thm:rt-normality}
+Suppose Assumptions~\ref{ass:rt-environment} and~\ref{ass:rt-fclt} hold. Then
+\begin{equation}
+\label{eq:rt-theta-normality}
+    \sqrt{N^Y_\tau}
+    \left(\widehat\theta^Y_\tau-\theta^Y\right)
+    \Rightarrow
+    \mathcal N(0,\Omega^Y_\theta) .
+\end{equation}
+If Assumption~\ref{ass:rt-lrv} also holds, then \(\Omega^Y_\theta\) may be replaced by \(\widehat\Omega^Y_{\theta,\tau}=\widehat D_{\phi,\tau}\widehat\Omega^Y_{\mu,\tau}\widehat D_{\phi,\tau}'\), where \(\widehat D_{\phi,\tau}\) is the sample analogue of \(D_\phi\). Consequently, for any fixed contrast vector \(c\) such that \(c'\Omega^Y_\theta c>0\),
+\begin{equation}
+\label{eq:rt-studentized-contrast}
+    \frac{
+    \sqrt{N^Y_\tau}\,c'\left(\widehat\theta^Y_\tau-\theta^Y\right)
+    }{
+    \left(c'\widehat\Omega^Y_{\theta,\tau}c\right)^{1/2}
+    }
+    \Rightarrow
+    \mathcal N(0,1).
+\end{equation}
+\end{theorem}
+
+Theorem~\ref{thm:rt-normality} gives inference for fixed state-method risks, risk differences, and smooth aggregates. The studentized statement applies to prespecified smooth contrasts. The selected method depends on an argmin map and is governed by the margin logic in Proposition~\ref{prop:rt-selector-consistency}.
+
+The covariance \(\Omega^Y_\theta\) inherits the structure of the ratio map \(\phi\). For each risk coordinate,
+\begin{equation*}
+    dR^Y_{j,k}
+    =
+    \frac{1}{p^Y_j}
+    \left(dm^Y_{j,k}-R^Y_{j,k}\,dp^Y_j\right).
+\end{equation*}
+Both state shares and state-method loss sums are estimated. Treating \(\widehat R^Y_{\tau,j,k}\) as if \(p^Y_j\) were known would give an incorrect variance for state-specific risks.
+
+A common use of Theorem~\ref{thm:rt-normality} is to compare two prespecified methods in a fixed state. Taking the contrast vector in \eqref{eq:rt-studentized-contrast} to put weight one on \((j,k)\), weight minus one on \((j,m)\), and zero elsewhere gives
+\begin{equation*}
+    \frac{
+    \sqrt{N^Y_\tau}
+    \left[
+        (\widehat R^Y_{\tau,j,k}-\widehat R^Y_{\tau,j,m})
+        -(R^Y_{j,k}-R^Y_{j,m})
+    \right]
+    }{
+    \widehat\sigma^Y_{j,km}
+    }
+    \Rightarrow
+    \mathcal N(0,1),
+\end{equation*}
+where \((\widehat\sigma^Y_{j,km})^2=c'\widehat\Omega^Y_{\theta,\tau}c\) for the corresponding contrast vector \(c\). This fixed-contrast statement complements Proposition~\ref{prop:rt-selector-consistency}: under a positive margin the selected index equals the oracle selector with probability approaching one, while at ties it has a nonstandard argmin limit.
+
+The release-risk CLT also supports inference for smooth functionals of the risk vector, including reweighted risks, validation-to-target adjustments, and the local gain from state-dependent selection.
+
+\begin{corollary}[Smooth validation-to-target transformations]
+\label{cor:rt-smooth-target}
+Suppose the conditions of Theorem~\ref{thm:rt-normality} hold. Let \(\theta^T=\psi(\theta^Y)\) be a target-risk or target-performance vector identified by a continuously differentiable map \(\psi\) at \(\theta^Y\), and let \(\widehat\theta^T_\tau=\psi(\widehat\theta^Y_\tau)\). Then
+\begin{equation}
+\label{eq:rt-smooth-target-normality}
+    \sqrt{N^Y_\tau}
+    \left(\widehat\theta^T_\tau-\theta^T\right)
+    \Rightarrow
+    \mathcal N\!\bigl(0,D_\psi\Omega^Y_\theta D_\psi'\bigr),
+\end{equation}
+where \(D_\psi\) is the Jacobian of \(\psi\) at \(\theta^Y\).
+\end{corollary}
+
+Corollary~\ref{cor:rt-smooth-target} describes how uncertainty propagates once a smooth validation-to-target map has been specified. The map \(\psi\) may represent reweighting from a validation population to a target population or a smooth bridge from local validation risks to a target criterion. The bridge itself remains an econometric identification requirement.
+
+A second smooth functional is the local value of state dependence. For the local release criterion, this value compares the best static completion method with the statewise release-risk oracle:
+\begin{equation}
+\label{eq:rt-local-gain}
+    \mathcal G_Y
+    =
+    \min_{k\in\Kcal}\sum_{j\in\mathcal J_Y}p^Y_j R^Y_{j,k}
+    -
+    \sum_{j\in\mathcal J_Y}p^Y_j\min_{k\in\Kcal}R^Y_{j,k},
+\end{equation}
+with plug-in analogue \(\widehat{\mathcal G}_{Y,\tau}\).
+
+\begin{corollary}[Asymptotic normality of the estimated local gain]
+\label{cor:rt-gain-normality}
+Suppose the conditions of Theorem~\ref{thm:rt-normality} and Assumption~\ref{ass:rt-lrv} hold. Suppose also that the best static method \(k^Y_{\mathrm{stat}}\in\argmin_{k\in\Kcal}\sum_{j\in\mathcal J_Y}p^Y_jR^Y_{j,k}\) is unique and that, for every \(j\in\mathcal J_Y\), the local oracle method \(k^Y_j\in\argmin_{k\in\Kcal}R^Y_{j,k}\) is unique. Let \(d_G\) be the gradient of the map in \eqref{eq:rt-local-gain} at \(\theta^Y\), and let \(\widehat d_{G,\tau}\) be its plug-in analogue. If \(d_G'\Omega^Y_\theta d_G>0\), then
+\begin{equation}
+\label{eq:rt-gain-normality}
+    \frac{
+    \sqrt{N^Y_\tau}(\widehat{\mathcal G}_{Y,\tau}-\mathcal G_Y)
+    }{
+    \left(\widehat d_{G,\tau}'\widehat\Omega^Y_{\theta,\tau}\widehat d_{G,\tau}\right)^{1/2}
+    }
+    \Rightarrow
+    \mathcal N(0,1).
+\end{equation}
+\end{corollary}
+
+Corollary~\ref{cor:rt-gain-normality} provides inference for the estimated gain from state-dependent selection, not for the selected rule itself. Uniqueness of the best static method and of the statewise oracle methods makes the gain functional locally smooth. If either minimizer is tied, the minimum operator is not differentiable and the scalar normal approximation in \eqref{eq:rt-gain-normality} no longer applies.
+
+The four designs in Section~\ref{sec:taxonomy} enter this limit theory through the object being validated. Delayed releases give direct consistency and normality for local release risks when Assumption~\ref{ass:rt-fclt} holds. Mixed-frequency designs have the same structure when the aggregate or restriction loss is the target loss. Evaluable missingness requires a transport link before the limit distribution has target interpretation; if the link is smooth, Corollary~\ref{cor:rt-smooth-target} applies. Completed-panel target evaluation requires either direct delayed observation of the target loss or a bridge from local release risks to the target-object criterion. If the target-object loss is a nonlinear functional of nonstationary components, a separate weak-convergence argument may be required; see, for example, the stochastic-integral limits in \citet{LiangPhillipsWangWang2016}.
+
+Finally, let \(\Phi_{\tau,h}\) be a vintage-available map from the completed panel and decision-date information to a prediction or estimate of a target object \(Z_{\tau+h}\). For a completion rule \(\pi\), define
+\begin{equation}
+\label{eq:rt-target-object-loss}
+    \widehat Z^{(\pi)}_{\tau+h|\tau}
+    =
+    \Phi_{\tau,h}\!\left(\widehat Y^{(\pi)}_\tau,\Fcal_\tau\right),
+    \qquad
+    L^Z_\tau(\pi)
+    =
+    L_Z\!\left(\widehat Z^{(\pi)}_{\tau+h|\tau},Z_{\tau+h}\right) .
+\end{equation}
+The loss in \eqref{eq:rt-target-object-loss} can differ from any sum of local release losses and may rank completion methods differently from \eqref{eq:rt-local-risk}.
+
+There are two coherent ways to use such losses. If \(Z_{\tau+h}\) is observed later and \(L^Z_\tau(\pi)\) is used directly for learning, the decision unit becomes the completed vintage, or the selection rule applied to that vintage, and feedback is delayed at the target-object level. If the rule is learned from local release losses and evaluated by \(L^Z_\tau\), a bridge condition is required: local release validation must preserve, or approximate, the ranking induced by the target-object criterion.
+
+Release-validated performance and target-object performance are distinct objects and should be reported separately. Whether their rankings agree depends on the application and on the bridge between the local and downstream criteria.
+
+\section{Monte Carlo Evidence}
+\label{sec:montecarlo}
+
+This section reports Monte Carlo evidence on the finite-sample behavior of panel-indexed method selection under delayed or indirect validation. The designs examine the gain-cost mechanism in Sections~\ref{sec:selection} and~\ref{sec:completion}. The central comparison is between the population objects emphasized by the theory: a state-dependent oracle, a best static method, and a feasible sequential rule that learns from validation feedback available at the decision date.
+
+A common baseline panel environment is used across designs, while state-dependent separation, feedback timing, feedback observability, and the validation-target relation are varied across scenarios. Delayed releases correspond to full validation of later released cells; mixed-frequency non-availability is represented by aggregate or block validation; evaluable missingness is represented by a validation-population shift; completed-panel evaluation is represented by a target-object loss; and selected-arm feedback is included as a partial-feedback benchmark. The Internet Appendix reports the calibration choices, bridge diagnostics, and scaling output.
+
+\subsection{Design}
+\label{subsec:mc-design}
+\enlargethispage{\baselineskip}
+
+The simulated decision unit corresponds to the real-time frontier unit \(u=(i,t,\tau)\) in Section~\ref{sec:completion}. A batch is a decision date, and the vintage index is suppressed below. The simulated panel has units \(i=1,\ldots,N\) and dates \(t=1,\ldots,T\), generated by a common component and a local persistent component,
+\begin{align*}
+Y_{it} &= \lambda_i f_t + u_{it},\\
+u_{it} &= \rho_i u_{i,t-1} + \sigma_i \varepsilon_{it}.
+\end{align*}
+Heterogeneity in \((\lambda_i,\rho_i,\sigma_i)\) determines which method is locally best. The state label \(G_u\) has three cells: factor-dominant, persistence-dominant, and noisy/local. It is observed at the decision date and is coarser than the data-generating process. The feasible rule therefore learns state-dependent method rankings rather than the full law of \(Y_{it}\).
+
+The finite method menu \(\Kcal\) contains three econometric methods. The first is a local persistence rule based on own-series lagged values. The second is a pooling rule based on lagged cross-sectional information available at the decision date. The third is a factor rule based on a one-step factor forecast; it plays the role of the common-component class used in the empirical illustration of Section~\ref{sec:empirical-illustration}. Candidate completions are feasible at the decision date: the contemporaneous value \(Y_{it}\) enters only when the validation loss is computed. In full-validation scenarios, losses for all three methods are reconstructed after validation. In the selected-arm scenario, only the chosen method is evaluated, so exploration is needed to populate observed state-method cells.
+
+Table~\ref{tab:mc-regimes} summarizes the scenarios.
+
+\input{tables/table_mc_regimes_main_landscape.tex}
+
+The scenarios vary the source and size of the state-dependent gain and the reliability of the validation bridge. S0 is a null design with no state dependence. S1 introduces aligned state-dependent gains under full validation. S2 adds delayed feedback. S3 keeps the validation loss aligned with the target loss but changes the observational structure to a mixed-frequency setting. S4 introduces validation-target mismatch, so that validation risks no longer coincide with target risks. S5 is a bridge-failure design in which validation rankings are misleading for the target criterion. S6 increases the feedback difficulty by observing only the selected method after validation. Together, the scenarios vary the gain available to the oracle, the delay and dependence in feedback, the mismatch between validation and target losses, and the complexity of the feedback structure. The Internet Appendix reports the full calibration, including panel size, delay parameters, feedback regimes, initialization thresholds, and scaling grids.
+
+\subsection{Benchmarks and metrics}
+\label{subsec:mc-metrics}
+
+For each scenario, we compare the state-dependent oracle, the best static method, and the feasible sequential rule. Let \(R_{\mathrm{orc}}\), \(R_{\mathrm{stat}}\), and \(R_{\mathrm{seq}}\) denote their horizon-averaged risks over the scenario-specific target population and target criterion. The target criterion is cell release loss in S0--S2 and S6, aggregate or block loss in S3, target-population cell loss in S4, and target-object loss in S5. We report
+\[
+G = R_{\mathrm{stat}} - R_{\mathrm{orc}},\qquad
+\mathrm{Regret} = R_{\mathrm{seq}} - R_{\mathrm{orc}},\qquad
+\mathrm{Gap} = R_{\mathrm{seq}} - R_{\mathrm{stat}} .
+\]
+Here \(G\) is the oracle-static gain, \(\mathrm{Regret}\) is the feasible rule's risk distance from the oracle, and \(\mathrm{Gap}\) is its difference relative to the best static method. A negative gap means that the feasible rule improves on the static benchmark. When \(G\) is non-negligible, we also report the recovered gain share,
+\[
+\mathrm{Share}=\frac{R_{\mathrm{stat}}-R_{\mathrm{seq}}}{R_{\mathrm{stat}}-R_{\mathrm{orc}}}.
+\]
+The diagnostics include initialization shares, terminal validation archive sizes, state-method feedback sparsity, and oracle match rates. Archive size is a raw count of arrived validation records, not the dependence-adjusted effective sample size \(n^{\mathrm{eff}}\) used in Sections~\ref{sec:selection} and~\ref{sec:completion}. Under full validation, one arrived record scores all candidate methods; under selected-arm feedback, it scores only the chosen method. Reported standard errors are Monte Carlo standard errors across 1,000 replications. The final scaling grids also use 1,000 replications and are reported in the Internet Appendix; overlapping design points may differ slightly from Table~\ref{tab:mc-main} within simulation error.
+
+\subsection{Results}
+\label{subsec:mc-results}
+
+Table~\ref{tab:mc-main} reports the baseline results in three blocks within a single table. Panel A gives the risk decomposition. Panel B reports learning diagnostics. Panel C reports validation-target diagnostics for aggregate validation and population shift. S5 is excluded from the core gain-cost table because it evaluates a target-object bridge rather than local release risk. For S4, \(R_{\mathrm{seq}}\) in Panels A and B refers to the transport-corrected rule; the unadjusted validation rule is reported in Panel C.
+
+\input{tables/table_mc_main_results_main.tex}
+
+The weak-gain design S0 illustrates the case in which adaptation has little population value. The oracle-static gain is essentially zero, \(G=0.003\), and the feasible rule remains close to the best static benchmark. Exact oracle match carries little information in this near-tie design, because several methods are close substitutes and the target-risk cost of choosing a non-oracle method is negligible. The risk gap is therefore the relevant diagnostic for S0.
+
+In the aligned full-validation design S1, the oracle-static gain is substantial, \(G=0.309\), and the feasible rule nearly reaches the oracle: regret is \(0.005\), with recovered gain share \(0.982\). S2 has the same qualitative structure, but the arrived validation archive is smaller and state visitation is more uneven. At the baseline horizon the rule still improves substantially on the static benchmark. The scaling exercise below shows that these learning frictions are more severe in short panels.
+
+S4 illustrates validation-population shift. The validation population over-represents one subtype relative to the target population. The corrected rule minimizes validation risks after reweighting subtype-specific losses to the target subtype composition. The unadjusted validation rule has target risk 1.426, while the transport-corrected rule has target risk 1.162, giving a transport gain of 0.264. Rank agreement with the target ranking rises from 0.630 to 0.867 after correction. The correction uses subtype composition as the observed transport variable; without such information, the corrected rule would not be feasible and validation risks would be computed under the validation composition.
+
+S6 reports the cost of selected-arm feedback. The oracle-static gain is close to that in S1, but validation reveals only the loss of the selected method. The recovered gain share falls to 0.649 and regret rises to 0.103. This comparison separates the leading real-time completion case, which has delayed full validation, from a partial-feedback design in which exploration is needed for observability.
+
+The target-object scenario S5 asks whether local validation is informative about a target object constructed from the completed panel. It is therefore reported in the appendix diagnostics rather than in the core gain-cost table. In the notation of Section~\ref{sec:selection}, S5 is a bridge diagnostic in which the local validation criterion does not satisfy a useful validation-target link for the downstream target-object criterion. Local-target rank agreement is about 0.34, the local-trained rule has target-object risk 0.706, and an infeasible target-trained benchmark has risk 0.304. S5 records the consequences of bridge failure when the downstream target criterion is not aligned with local release loss. The Internet Appendix reports the full target-object diagnostics, including the distribution of bridge deterioration and local-target rank agreement.
+
+\subsection{Scaling exercises}
+\label{subsec:mc-scaling}
+
+The scaling designs vary the amount of arrived validation information and the strength of validation-target mismatch while holding the underlying mechanisms fixed. Figure~\ref{fig:mc-gain-cost} summarizes the main scaling patterns. The Internet Appendix gives the full numerical output for the time-scaling and cross-sectional-scaling grids, the bridge-strength exercises, and the representative application-size regimes.
+
+\begin{figure}[H]
+\centering
+\caption{Gain-cost diagnostics}
+\label{fig:mc-gain-cost}
+\IfFileExists{Figures/fig_mc_gain_cost.pdf}{%
+  \includegraphics[width=0.98\textwidth,height=0.72\textheight,keepaspectratio]{Figures/fig_mc_gain_cost.pdf}%
+}{%
+  \includegraphics[width=0.98\textwidth,height=0.72\textheight,keepaspectratio]{figures/fig_mc_gain_cost.pdf}%
+}
+\exhibitnote[0.95\textwidth]{Panels A--C use the final \(T\)-scaling exercise with \(T\in\{50,100,250,500,1000,2000\}\), \(N=60\), and 1,000 replications. Panel A reports recovered gain shares; Panel B reports regret relative to the oracle; Panel C reports state-method feedback sparsity. Higher values are better in Panel A, while lower values are better in Panels B and C. Panel D reports the bridge-strength exercises: S4 transport gain and S5 target-object deterioration as mismatch strength varies; larger values indicate a larger cost of validation-target mismatch.}
+\end{figure}
+
+The \(T\)-scaling exercise varies \(T\in\{50,100,250,500,1000,2000\}\) at \(N=60\) for S1, S2, and S6. In S1 and S2, increasing \(T\) nearly eliminates learning regret: recovered gain reaches 0.998 in S1 and 0.994 in S2 at \(T=2000\). The selected-arm design improves more slowly, with recovered gain rising from 0.460 to 0.743 over the same grid. Longer decision horizons reduce learning costs in all designs, but selected-arm feedback remains more costly than delayed full validation.
+
+The \(N\)-scaling exercise varies \(N\in\{30,60,120,240,500,1000\}\) at \(T=250\). Larger cross sections stabilize the validation archive and reduce state-method feedback sparsity, but the gains are more modest than in the \(T\)-scaling exercise. The learning horizon remains the main driver of convergence.
+
+The bridge-strength exercises reinforce the identification message. For S4, when validation-target mismatch is zero, the transport gain is approximately zero. As mismatch strength rises, the transport gain increases to 0.389, while unadjusted-target rank agreement falls to 0.492 and corrected-target agreement remains around 0.807. For S5, local-target rank agreement remains low, around 0.34, and the deterioration from using a local-trained rule rather than an infeasible target-trained benchmark rises from 0.190 to 0.603 as target-object divergence strengthens. The latter pattern records the consequence of bridge failure in a controlled design.
+
+The Internet Appendix also reports application-size regimes motivated by the four empirical cases in Section~\ref{sec:taxonomy}: macro real-time release panels, asynchronous or nonsynchronous financial panels, short applied-micro panels with validation-population shift, and completed-panel target-object evaluation. These regimes are not separate empirical applications. They show that the same gain-cost and validation-target logic operates in panels with different relative dimensions. Short panels mainly expose learning frictions; large cross sections improve validation-archive stability; selected-arm feedback remains information-limited; and target-object evaluation remains sensitive to the bridge between local and downstream criteria.
+
+The Monte Carlo evidence supports the gain-cost interpretation. Sequential completion is useful when the target-relevant state creates a sufficiently large oracle-static gain and validation feedback identifies the target ranking. Delays, dependence, small validation archives, and validation-target mismatch reduce the ability of the real-time rule to realize that gain. When the gain is small, or when validation rankings are misleading for the target criterion, the best static method can dominate the sequential rule. The simulations therefore clarify the role of the empirical application: FRED-MD is not expected to show automatic dominance of sequential completion, but to measure whether the available state dependence is large enough to offset the costs of learning from real-time feedback.
+
+
+\section{Empirical Illustration}
+\label{sec:empirical-illustration}
+
+This section implements the leading delayed-release case in Section~\ref{sec:completion}. The choice of FRED-MD is deliberate: its real-time vintages are public, widely used in macroeconomic nowcasting, and provide a familiar environment in which completion methods can be compared under a clear release-validation convention. The exercise has two layers. The first evaluates local release losses: a frontier cell is completed at vintage \(\tau\) and scored when the prespecified validation value is later observed. The second evaluates a completed-panel target object: completed vintages are passed through a common one-month-ahead INDPRO equation. The empirical analysis focuses on the delayed-release case because mixed-frequency validation, validation-population designs, and target-object validation require different data architectures: aggregate-release restrictions, comparable validation samples, or target feedback recorded directly at the completed-object level. Those cases are examined here through the taxonomy and Monte Carlo evidence rather than through separate empirical applications.
+
+The empirical sample consists of FRED-MD real-time vintages from 1999-08 to 2024-12, with 101 monthly series and INDPRO as the downstream target. The validation value is the first observed later-vintage value, and validation timing is measured in vintage-index time. The fixed method classes are local-history, cross-sectional pooling, common-component, and dynamic-filtering rules. The Internet Appendix documents the data layer, frontier-window construction, method-class implementation, state diagnostics, target-object design, and bootstrap inference for prespecified empirical comparisons.
+
+\subsection{Real-time macro panel design}
+\label{subsec:fred-design}
+
+The real-time panel is organized by data vintages. At vintage \(\tau\), the information set \(\Fcal_\tau\) contains only releases available at that vintage, the observation pattern, release-calendar information used by the analyst, and validation losses from earlier decisions whose validation values have already arrived. The raw frontier set contains cells that are required at the decision vintage but whose validation values are not yet available. For the main empirical illustration, the frontier is restricted to the six-month window
+\[
+\Ucal^Y_{\tau,6}
+=
+\{u=(i,t,\tau)\in\Ucal^Y_\tau:0\leq e(\tau)-t\leq 6\},
+\]
+where \(e(\tau)\) is the last panel reference date at vintage \(\tau\). This window is a design convention for current ragged edges. Wider-window diagnostics in the Internet Appendix show that the release-validation sample changes only marginally when older incomplete cells are admitted.
+
+The empirical menu contains four fixed vintage-feasible completion methods. The local-history method uses own-series information available at the decision vintage. Cross-sectional pooling uses contemporaneous observed values at the reference date. The common-component method reconstructs the vintage panel through a low-rank common component estimated from the vintage-available panel. The dynamic-filtering method uses one-sided same-series dynamics. The sequential selector is the rule \(\widehat\pi^Y_\tau(j)\in\Kcal\) that maps the state label observed at vintage \(\tau\) into one of these feasible completion methods.
+
+The state variable combines vintage-available information on the gap from the frontier and contemporaneous panel coverage, with sparse raw states pooled before evaluation. This low-dimensional partition keeps release-validated comparisons based on sufficiently populated cells and limits initialization costs. In the baseline window, all 4,022 frontier decisions are eventually release-validated, and the median reveal delay is one vintage. The empirical archive therefore provides frequent delayed full-validation feedback while preserving the decision-date information restriction.
+
+\subsection{Release-validation performance}
+\label{subsec:fred-release-validation}
+
+The first empirical layer evaluates local release performance. For each release-validated frontier unit \(u=(i,t,\tau)\) and method class \(k\), the loss is
+\[
+\ell^Y_u(k)=\{\widehat Y^{(k)}_{it|\tau}-Y_{it}\}^2,
+\]
+where \(Y_{it}\) is the prespecified later-vintage validation value. Since all candidate completions are stored or reproducibly reconstructed from the vintage archive, the later release scores every fixed method class on the same decision unit. The release-validation comparison is a delayed full-validation comparison.
+
+Table~\ref{tab:fred_release_validation} gives the local release-risk comparison. The common-component method is the best fixed benchmark, with MSE 1.162. The infeasible state oracle lowers MSE to 1.136, while the feasible sequential selector has MSE 1.190. The selector remains close to the common-component benchmark without improving on it in local release loss. This is the empirical analogue of the gain-cost comparison: the state-dependent gain is positive, but small relative to the finite-sample cost of learning it.
+
+\begin{table}[!htbp]
+\centering
+\caption{Release-validation performance}
+\label{tab:fred_release_validation}
+\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.30\textwidth}rrrc>{\raggedleft\arraybackslash}p{0.17\textwidth}@{}}
+\toprule
+Method or rule & MSE & RMSE & MAE & Relative MSE & Assignment \\
+\cmidrule(lr){1-1}\cmidrule(lr){2-2}\cmidrule(lr){3-3}\cmidrule(lr){4-4}\cmidrule(lr){5-5}\cmidrule(l){6-6}
+Local-history & 2.353 & 1.534 & 0.828 & 2.025 & fixed \\
+Cross-sectional pooling & 1.330 & 1.153 & 0.668 & 1.144 & fixed \\
+Common-component & 1.162 & 1.078 & 0.633 & 1.000 & fixed \\
+Dynamic-filtering & 1.407 & 1.186 & 0.658 & 1.211 & fixed \\
+Best fixed & 1.162 & 1.078 & 0.633 & 1.000 & fixed \\
+State oracle & 1.136 & 1.066 & -- & 0.977 & state-dep. \\
+Sequential selector & 1.190 & 1.091 & 0.635 & 1.024 & state-dep. \\
+\bottomrule
+\end{tabular}
+\exhibitnote{The evaluation sample uses the six-month frontier window and contains 4,022 release-validated decision units. Relative MSE is normalized to the best fixed release-validation benchmark. The state oracle is infeasible and uses ex post state-level risks. The sequential selector uses only release losses that have arrived before each decision vintage. State-dep. denotes state-dependent assignment.}
+\end{table}
+
+The state diagnostics explain the release-validation ranking. The common-component class is also the state oracle in the three largest states. Dynamic filtering is best in the smaller high-coverage state with a gap of three to six months. The estimated oracle-static gain is therefore limited: the best fixed risk is 1.162 and the state-oracle risk is 1.136. The feasible selector learns a small state-specific departure from an already strong fixed method, and the finite-sample learning cost offsets that departure in this sample.
+
+\subsection{Target-object performance}
+\label{subsec:fred-target-object}
+
+The second empirical layer evaluates each completed vintage through a downstream target object. The target is one-month-ahead INDPRO. For every completion rule, the same target map is used: the INDPRO target is predicted from a constant, lagged INDPRO, and the first principal component estimated from the completed vintage panel. The downstream equation and evaluation origins are held fixed, so differences in target-object loss come from the completion layer.
+
+Table~\ref{tab:fred_target_object} and Figure~\ref{fig:local_vs_target_loss} show that the local and downstream rankings are close but not identical. The common-component class is best for local release validation, while cross-sectional pooling and dynamic filtering have slightly lower INDPRO target-object MSE. The differences are small, and the bootstrap intervals reported in the Internet Appendix include zero for the prespecified comparisons. The empirical conclusion is that the loss used to learn the release-validation selector and the loss used to evaluate the completed-panel object are distinct econometric objects.
+
+\begin{table}[!htbp]
+\centering
+\caption{Target-object performance}
+\label{tab:fred_target_object}
+\footnotesize
+\setlength{\tabcolsep}{3.2pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.40\textwidth}rrrrcr@{}}
+\toprule
+Method or rule & L-RMSE & T-MSE & T-RMSE & T-MAE & Rel. MSE & Diff. \\
+\cmidrule(lr){1-1}\cmidrule(lr){2-2}\cmidrule(lr){3-3}\cmidrule(lr){4-4}\cmidrule(lr){5-5}\cmidrule(lr){6-6}\cmidrule(l){7-7}
+Local-history & 1.534 & 1.812 & 1.346 & 0.663 & 1.001 & 0.002 \\
+Cross-sectional pooling & 1.153 & 1.792 & 1.338 & 0.664 & 0.990 & -0.019 \\
+Common-component & 1.078 & 1.810 & 1.345 & 0.665 & 1.000 & 0.000 \\
+Dynamic-filtering & 1.186 & 1.795 & 1.340 & 0.663 & 0.992 & -0.015 \\
+Best fixed release-validation benchmark & 1.078 & 1.810 & 1.345 & 0.665 & 1.000 & 0.000 \\
+Sequential selector & 1.091 & 1.810 & 1.345 & 0.665 & 1.000 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\exhibitnote{The target is one-month-ahead INDPRO. The same downstream equation is applied to each completed panel, so only the completion rule changes. L-RMSE denotes local release RMSE; T-MSE, T-RMSE, and T-MAE denote target-object losses. Rel. MSE and Diff. are computed relative to the best fixed release-validation benchmark, the common-component method. Bootstrap inference for prespecified target-object differences is reported in the Internet Appendix.}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\caption{Local release loss and target-object loss}
+\label{fig:local_vs_target_loss}
+\IfFileExists{Figures/fig_local_vs_target_loss.pdf}{%
+  \includegraphics[width=0.86\textwidth,height=0.55\textheight,keepaspectratio]{Figures/fig_local_vs_target_loss.pdf}%
+}{%
+  \includegraphics[width=0.86\textwidth,height=0.55\textheight,keepaspectratio]{figures/fig_local_vs_target_loss.pdf}%
+}
+\exhibitnote[0.94\textwidth]{The horizontal axis reports local release RMSE. The vertical axis reports target-object RMSE for the one-month-ahead INDPRO exercise. Each point is a fixed method class or the feasible sequential selector. The state oracle is not displayed because it is infeasible.}
+\end{figure}
+
+The target-object results reinforce the validation-target distinction. The local release archive supplies the feedback used to construct the selector, while the downstream loss evaluates a completed-panel object. When local state dependence is modest and the downstream ranking differs from the local ranking, a rule learned from local release losses may have little effect on target-object performance. The bootstrap calculations in the Internet Appendix summarize prespecified loss differences conditional on the realized real-time evaluation path. They target the same type of smooth risk differences and gain functionals covered by the limit theory in Section~\ref{subsec:rt-inference}, with block resampling used as a finite-sample device that preserves vintage and release-date dependence.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper has formulated panel completion as a sequential econometric decision problem. An unavailable entry is viewed as a decision unit: at a given decision date, the investigator chooses a completion method using the available information, and the completed panel is later evaluated through a target criterion. This formulation brings unreleased cells, mixed-frequency variables, persistent non-availability, validation samples, aggregate restrictions, and downstream target objects into a common structure.
+
+The analysis shows that the value of sequential completion depends on the information content of the feedback available after decisions are made. Local release errors, validation losses, and target-object losses may rank completion methods differently. A feasible sequential rule improves on a static benchmark when the state-dependent gain from choosing different methods across decision units is large enough to offset learning, delay, and validation-target mismatch costs. Our theoretical results make this comparison explicit: the relevant feedback is the one that is sufficiently aligned with the loss by which the completed panel will ultimately be judged. They also show that the positive gap to the best static method is controlled by the same costs when state-dependent gain is weak, and that sequential adaptation dominates once the realized gain is large enough to cover them.
+
+The simulations and the FRED-MD application support this interpretation. Sequential rules perform well when observable decision-date states predict meaningful changes in method rankings and when the feedback signal preserves the target ranking with sufficient accuracy. Their gains are limited when rankings are stable, feedback is delayed, or the validation criterion is weakly connected to the target object. In the delayed-release application, the sequential rule remains close to the best common-component benchmark, while rankings based on local industrial-production release accuracy differ from rankings for the downstream target. These findings suggest that completion methods should be evaluated at the level of the object they are used to construct. Indeed, sequential adaptation is useful when feasible feedback helps predict that object, and its costs are part of the econometric comparison.
+
+\appendix
+
+\section{Proofs}
+\label{app:proofs}
+
+This appendix collects the proofs of the formal results in Sections~\ref{sec:selection} and~\ref{sec:completion}. The proofs use the notation introduced in the main text.
+
+\subsection{Proofs for Section~\ref{sec:selection}}
+
+\subsection*{Proof of Proposition~\ref{prop:identification}}
+Fix a target-relevant state \(j\in\mathcal J_T\) and a method \(k\in\Kcal\). By Assumption~\ref{ass:observable-validation}(a), the event \(\{G_{u,b}=j,V_{u,b}=1,k\in\Kcal^V_{u,b}\}\) has positive probability. Assumption~\ref{ass:observable-validation}(b) implies
+\begin{equation*}
+    \E\!\left[\ell^V_{u,b}(k)\mid G_{u,b}=j,\ V_{u,b}=1,\ k\in\Kcal^V_{u,b}\right]
+    =R^V_{j,k} .
+\end{equation*}
+The left-hand side is a feature of the observable validation distribution, while the right-hand side is the validation risk defined in \eqref{eq:state-risks}. This proves part (a).
+
+For part (b), let \(k_V\in\argmin_{m\in\Kcal}R^V_{j,m}\). Then \(\Delta^V_{j,k_V}=0\) by \eqref{eq:state-risks}. The validation-target link in \eqref{eq:validation-target-link} gives
+\begin{equation*}
+    0\leq \Delta^T_{j,k_V}\leq \Lambda\Delta^V_{j,k_V}+\eta_B=\eta_B .
+\end{equation*}
+If \(\eta_B=0\), this implies \(\Delta^T_{j,k_V}=0\), so \(k_V\in\argmin_{m\in\Kcal}R^T_{j,m}\). This proves \eqref{eq:identified-selector}. Part (c) follows because the validation minimizer set is identified by part (a); if that set coincides with the target minimizer set, the target minimizer set is identified as well. If the target minimizer is unique, the common set is a singleton.
+
+\subsection*{Proof of Lemma~\ref{lem:state-dependent-gain}}
+For any fixed method \(k\in\Kcal\) and any state \(j\in\mathcal J_T\),
+\begin{equation*}
+    R^T_{j,k}\geq \min_{m\in\Kcal}R^T_{j,m} .
+\end{equation*}
+Multiplying by \(p^T_j\), summing over \(j\in\mathcal J_T\), and using \eqref{eq:oracle-static-gain} gives
+\begin{equation*}
+    \bar R^T_k-R^T_{\mathrm{orc}}
+    =
+    \sum_{j\in\mathcal J_T}p^T_j
+    \left(R^T_{j,k}-\min_{m\in\Kcal}R^T_{j,m}\right)
+    \geq0 .
+\end{equation*}
+Taking the minimum over \(k\in\Kcal\) proves nonnegativity.
+
+If there exists a method \(k_0\) that is target-optimal in every state in \(\mathcal J_T\), every term in the preceding sum is zero for \(k=k_0\). Thus \(\bar R^T_{k_0}=R^T_{\mathrm{orc}}\), and \(\mathcal G_T=0\). Conversely, suppose \(\mathcal G_T=0\). Since \(\Kcal\) is finite, choose \(k_0\in\argmin_{k\in\Kcal}\bar R^T_k\). The preceding sum is a weighted sum of nonnegative terms and equals zero for \(k_0\). Since \(p^T_j>0\) for every \(j\in\mathcal J_T\), each term must be zero. Hence \(k_0\) is target-optimal in every target-relevant state. This proves the equivalence in part (b). Part (c) is the contrapositive of the only-if direction.
+
+\subsection*{Proof of Lemma~\ref{lem:empirical-validation-risk}}
+Fix \(j\in\mathcal J_T\), and let \(k^V_j\in\argmin_{k\in\Kcal}R^V_{j,k}\). Since \(r\) is initialized, all empirical risks needed to define \(\widehat\pi_r(j)\) are available. By definition of the empirical minimizer in \eqref{eq:empirical-risk-selector},
+\begin{equation*}
+    \widehat R^V_{r,j,\widehat\pi_r(j)}
+    \leq
+    \widehat R^V_{r,j,k^V_j} .
+\end{equation*}
+Adding and subtracting population validation risks yields
+\begin{equation*}
+\begin{aligned}
+    R^V_{j,\widehat\pi_r(j)}-R^V_{j,k^V_j}
+    &=
+    \left(R^V_{j,\widehat\pi_r(j)}-\widehat R^V_{r,j,\widehat\pi_r(j)}\right)
+    +
+    \left(\widehat R^V_{r,j,\widehat\pi_r(j)}-\widehat R^V_{r,j,k^V_j}\right)
+    \\
+    &\quad+
+    \left(\widehat R^V_{r,j,k^V_j}-R^V_{j,k^V_j}\right) .
+\end{aligned}
+\end{equation*}
+The middle term is nonpositive by empirical minimization. Under the uniform error condition in the hypothesis of the lemma, the first and third terms are each bounded above by \(\varepsilon_r\). Therefore
+\begin{equation*}
+    R^V_{j,\widehat\pi_r(j)}-R^V_{j,k^V_j}\leq2\varepsilon_r .
+\end{equation*}
+Since \(k^V_j\) minimizes validation risk, the left-hand side is \(\Delta^V_{j,\widehat\pi_r(j)}\). This proves the first statement. The uniform statement follows by applying the concentration event in Assumption~\ref{ass:effective-concentration} and setting \(\varepsilon_r=\varepsilon_B\) as in \eqref{eq:epsilon-B}.
+
+\subsection*{Proof of Proposition~\ref{prop:risk-consistency}}
+On the event in Assumption~\ref{ass:effective-concentration}, Lemma~\ref{lem:empirical-validation-risk} gives
+\begin{equation*}
+    \sup_{r\in\mathcal I_B}\sup_{j\in\mathcal J_T}
+    \Delta^V_{j,\widehat\pi_r(j)}
+    \leq 2\varepsilon_B .
+\end{equation*}
+Applying the validation-target link in \eqref{eq:validation-target-link} gives \eqref{eq:selector-risk-bound}. This proves part (a).
+
+For part (b), fix \(\alpha>0\) and \(\rho>0\). Choose \(\delta\in(0,\rho)\). On the concentration event, the right-hand side of \eqref{eq:selector-risk-bound} is \(2\Lambda\varepsilon_B+\eta_B\). The rate conditions in part (b) imply that this quantity converges to zero in probability for fixed \(\delta\). Therefore the probability that the left-hand side of \eqref{eq:selector-risk-consistency} exceeds \(\alpha\) is bounded by the probability that the concentration event fails plus a term smaller than \(\rho\) for large \(B\). Since the concentration event fails with probability at most \(\delta<\rho\), the probability is eventually no larger than \(2\rho\). Because \(\rho\) is arbitrary, \eqref{eq:selector-risk-consistency} follows.
+
+For part (c), let \(\Pi_T^\star(j)=\argmin_{k\in\Kcal}R^T_{j,k}\). By part (b), with probability approaching one,
+\begin{equation*}
+    \sup_{r\in\mathcal I_B}\sup_{j\in\mathcal J_T}
+    \Delta^T_{j,\widehat\pi_r(j)}<\gamma .
+\end{equation*}
+On this event, no selected method can lie outside \(\Pi_T^\star(j)\), because every method outside that set has target excess risk at least \(\gamma\). Hence \(\widehat\pi_r(j)\in\Pi_T^\star(j)\) for all initialized batches and target-relevant states, which proves \eqref{eq:selector-exact-recovery}.
+
+\subsection*{Proof of Theorem~\ref{thm:oracle-approximation}}
+Let \(\mathcal E_B(\delta)\) be the concentration event in Assumption~\ref{ass:effective-concentration}, and define \(\varepsilon_B\) as in \eqref{eq:epsilon-B}. On \(\mathcal E_B(\delta)\), Proposition~\ref{prop:risk-consistency}(a) implies that, for every initialized batch \(r\in\mathcal I_B\), every target-relevant state \(j\in\mathcal J_T\), and the empirical selector \(\widehat\pi_r(j)\),
+\begin{equation*}
+    \Delta^T_{j,\widehat\pi_r(j)}
+    \leq
+    2\Lambda\varepsilon_B+\eta_B .
+\end{equation*}
+On uninitialized batches, Assumption~\ref{ass:bounded-target-excess} gives \(\Delta^T_{j,k}\leq\bar L\) for every target-relevant state and method.
+
+For any target object \((u,r)\) with \(T_{u,r}=1\), set \(j=G_{u,r}\). Because \(T_{u,r}=1\) implies \(j\in\mathcal J_T\), the regret contribution of that object is the target excess risk of the method selected by the feasible rule. Hence, on \(\mathcal E_B(\delta)\),
+\begin{equation*}
+\begin{aligned}
+    \mathcal R^T_B(\widehat\pi^{\mathrm{seq}})
+    &\leq
+    \sum_{r=1}^{B}\sum_{u\in\Ucal_r}
+    T_{u,r}
+    \left[
+        I_r(2\Lambda\varepsilon_B+\eta_B)+(1-I_r)\bar L
+    \right]
+    \\
+    &=
+    (M^T_B-M^0_B)(2\Lambda\varepsilon_B+\eta_B)+M^0_B\bar L .
+\end{aligned}
+\end{equation*}
+Dividing by \(M^T_B>0\) gives
+\begin{equation*}
+    \frac{\mathcal R^T_B(\widehat\pi^{\mathrm{seq}})}{M^T_B}
+    \leq
+    \left(1-\frac{M^0_B}{M^T_B}\right)(2\Lambda\varepsilon_B+\eta_B)
+    +
+    \bar L\frac{M^0_B}{M^T_B}
+    \leq
+    2\Lambda\varepsilon_B+\eta_B+\bar L\frac{M^0_B}{M^T_B} .
+\end{equation*}
+Substituting the definition of \(\varepsilon_B\) from \eqref{eq:epsilon-B} proves \eqref{eq:oracle-approximation-bound} on \(\mathcal E_B(\delta)\cap\{M^T_B>0\}\). The concentration event has probability at least \(1-\delta\), and the finite-sample inequality is interpreted on \(\{M^T_B>0\}\) when the target mass is random.
+
+For part (b), fix \(\alpha>0\) and \(\rho>0\), and choose \(\delta\in(0,\rho)\). For this fixed \(\delta\), the rate conditions in \eqref{eq:oracle-approximation-rates} imply that the right-hand side of \eqref{eq:oracle-approximation-bound} converges to zero in probability on the event \(M^T_B>0\). Hence, for all sufficiently large \(B\), the probability that this right-hand side exceeds \(\alpha\) on \(\{M^T_B>0\}\) is at most \(\rho\). The bound itself fails only outside \(\mathcal E_B(\delta)\), an event with probability at most \(\delta<\rho\). If \(M^T_B\) is random, Assumption~\ref{ass:bounded-target-excess}(b) gives \(\Prb\{M^T_B>0\}\to1\); the average regret is interpreted on this nonempty-target event. Therefore
+\begin{equation*}
+    \Prb\!\left\{
+        M^T_B>0,
+        \frac{\mathcal R^T_B(\widehat\pi^{\mathrm{seq}})}{M^T_B}>\alpha
+    \right\}
+    \leq 2\rho
+\end{equation*}
+for all sufficiently large \(B\). Since \(\rho\) is arbitrary and \(\Prb\{M^T_B>0\}\to1\), \eqref{eq:oracle-approximation-convergence} follows for the nondegenerate evaluation sequence.
+
+\subsection*{Proof of Corollary~\ref{cor:static-dominance}}
+All statements are on the event \(M^T_B>0\). Define the realized target-state frequencies
+\begin{equation*}
+\widehat p^{\,T}_{B,j}
+=\frac{1}{M^T_B}\sum_{r=1}^{B}\sum_{u\in\Ucal_r}T_{u,r}1\{G_{u,r}=j\},
+\qquad j\in\{1,\ldots,J\},
+\end{equation*}
+and let \(\mathcal J_B=\{j:\widehat p^{\,T}_{B,j}>0\}\) be the set of visited target states. By construction, \(\widehat p^{\,T}_{B,j}\geq 0\) and \(\sum_j\widehat p^{\,T}_{B,j}=1\). Because \(T_{u,r}=1\) implies \(G_{u,r}\in\mathcal J_T\), as in the proof of Theorem~\ref{thm:oracle-approximation}, we have \(\mathcal J_B\subseteq\mathcal J_T\), so all state risks below are well defined. Grouping the sums defining \(\mathcal A^T_B\) by states gives, for every constant rule \(k\) and for the oracle,
+\begin{equation*}
+\mathcal A^T_B(k)=\sum_{j\in\mathcal J_B}\widehat p^{\,T}_{B,j}\,R^T_{j,k},
+\qquad
+\mathcal A^T_B(\pi^\star_T)=\sum_{j\in\mathcal J_B}\widehat p^{\,T}_{B,j}\,\min_{m\in\Kcal}R^T_{j,m},
+\end{equation*}
+where the second equality uses the statewise minimality of \(\pi^\star_T\).
+
+(a) By \eqref{eq:target-regret} and linearity, \(\mathcal A^T_B(\pi)-\mathcal A^T_B(\pi^\star_T)=\mathcal R^T_B(\pi)/M^T_B\) for every feasible rule \(\pi\). Adding and subtracting \(\mathcal A^T_B(\pi^\star_T)\),
+\begin{equation*}
+\mathcal A^T_B(\pi)-\min_{k\in\Kcal}\mathcal A^T_B(k)
+=\Big[\mathcal A^T_B(\pi)-\mathcal A^T_B(\pi^\star_T)\Big]
+-\Big[\min_{k\in\Kcal}\mathcal A^T_B(k)-\mathcal A^T_B(\pi^\star_T)\Big]
+=\frac{\mathcal R^T_B(\pi)}{M^T_B}-\overline{\mathcal G}_B .
+\end{equation*}
+For the remaining claims in part (a), the state grouping above gives
+\begin{equation*}
+\overline{\mathcal G}_B
+=\min_{k\in\Kcal}\sum_{j\in\mathcal J_B}\widehat p^{\,T}_{B,j}\,\Delta^T_{j,k},
+\end{equation*}
+with \(\Delta^T_{j,k}\geq 0\) the target excess risk in \eqref{eq:state-risks}. Every candidate sum is nonnegative, and the minimum over the finite set \(\Kcal\) is attained; hence \(\overline{\mathcal G}_B\geq 0\), with equality if and only if some \(k_0\in\Kcal\) satisfies \(\Delta^T_{j,k_0}=0\), that is, attains the statewise minimum target risk, for every \(j\in\mathcal J_B\).
+
+(b) Apply the identity in part (a) with \(\pi=\widehat\pi^{\mathrm{seq}}\), and bound \(\mathcal R^T_B(\widehat\pi^{\mathrm{seq}})/M^T_B\) by Theorem~\ref{thm:oracle-approximation}(a) on the stated event. If \(\overline{\mathcal G}_B\) exceeds the sum of the three cost terms, the right-hand side of \eqref{eq:static-gap-bound} is strictly negative, so \(\mathcal A^T_B(\widehat\pi^{\mathrm{seq}})<\mathcal A^T_B(k)\) for every \(k\in\Kcal\).
+
+(c) Each summand of \(\mathcal R^T_B(\widehat\pi^{\mathrm{seq}})\) is a nonnegative excess risk, so \(\mathcal R^T_B(\widehat\pi^{\mathrm{seq}})\geq 0\) pathwise. Since \(\overline{\mathcal G}_B\geq 0\), part (a) implies
+\begin{equation*}
+\mathcal A^T_B(\widehat\pi^{\mathrm{seq}})-\min_{k\in\Kcal}\mathcal A^T_B(k)
+\leq\frac{\mathcal R^T_B(\widehat\pi^{\mathrm{seq}})}{M^T_B}
+\end{equation*}
+pathwise, and therefore the positive part of the left-hand side is bounded by \(\mathcal R^T_B(\widehat\pi^{\mathrm{seq}})/M^T_B\), which is \(o_p(1)\) by Theorem~\ref{thm:oracle-approximation}(b) under \eqref{eq:oracle-approximation-rates}. This proves the first claim. For the second, fix \(g>0\) as stated. By the identity in part (a),
+\begin{equation*}
+\Big\{\mathcal A^T_B(\widehat\pi^{\mathrm{seq}})-\min_{k\in\Kcal}\mathcal A^T_B(k)>-g/2\Big\}
+\subseteq
+\Big\{\frac{\mathcal R^T_B(\widehat\pi^{\mathrm{seq}})}{M^T_B}>\frac{g}{2}\Big\}
+\cup
+\Big\{\overline{\mathcal G}_B<g\Big\},
+\end{equation*}
+and both events on the right-hand side have probability tending to zero, the first by \eqref{eq:oracle-approximation-convergence} and the second by hypothesis.
+
+(d) When the risks \(R^T_{j,k}\) do not depend on \(B\), define, for a probability vector \(w\) on \(\{1,\ldots,J\}\),
+\begin{equation*}
+\Gamma(w)=\min_{k\in\Kcal}\sum_{j}w_j R^T_{j,k}-\sum_{j}w_j\min_{m\in\Kcal}R^T_{j,m}.
+\end{equation*}
+The map \(\Gamma\) is continuous on the simplex, being the difference between a finite minimum of linear functions and a linear function. The state grouping above gives \(\overline{\mathcal G}_B=\Gamma(\widehat p^{\,T}_B)\), and \eqref{eq:oracle-static-gain} gives \(\mathcal G_T=\Gamma(p^T)\). Convergence in probability of \(\widehat p^{\,T}_B\) to \(p^T\) and the continuous mapping theorem yield \(\overline{\mathcal G}_B\to_p\mathcal G_T\). If \(\mathcal G_T>0\) and \(0<g<\mathcal G_T\), then \(\Prb\{\overline{\mathcal G}_B\geq g\}\to 1\), so the condition in part (c) holds.
+
+\subsection{Proofs for Section~\ref{sec:completion}}
+
+The arguments separate four steps: identification of the aligned release-validation problem, consistency and regret of the selection rule, limit theory for release-risk functionals, and delta-method inference for smooth target transformations and local gains.
+
+\subsection*{Proof of Proposition~\ref{prop:rt-release-alignment}}
+Fix a release-validated frontier decision unit \(u=(i,t,\tau)\) and a method \(k\in\Kcal\). By Assumption~\ref{ass:rt-environment}, the candidate completion \(\widehat Y^{(k)}_u\) is constructed from \(\Fcal_\tau\) alone, and either stored at vintage \(\tau\) or reproducibly reconstructed from archived vintage information without using the later validation value. The local release loss \(\ell^Y_u(k)=L_Y(\widehat Y^{(k)}_u,Y_{it})\) is therefore well defined for every \(k\in\Kcal\) once \(Y_{it}\) is released at \(r(u)\).
+
+For the local release-validated criterion the validation object and the target object coincide with the same frontier decision unit; the validation and target losses are both \(\ell^Y_u(k)\), and the validation and target populations are both the release-validated population. Assumption~\ref{ass:rt-environment}(d) ensures that every candidate method can be scored ex post, so the observable method set is \(\Kcal\).
+
+\subsection*{Proof of Proposition~\ref{prop:rt-selector-consistency}}
+On the concentration event in Assumption~\ref{ass:rt-concentration}, the uniform risk error over initialized vintages, states, and methods is at most \(\varepsilon^Y_B\) defined in \eqref{eq:rt-epsilon}. The argument of Lemma~\ref{lem:empirical-validation-risk}, applied to release validation, then gives \(\Delta^Y_{j,\widehat\pi^Y_\tau(j)}\leq 2\varepsilon^Y_B\) for every initialized vintage and state; taking the supremum proves \eqref{eq:rt-selector-excess}.
+
+If \(\log(JKB)/\underline n^{Y,\mathrm{eff}}_B=o_p(1)\), then \(\varepsilon^Y_B=o_p(1)\) for fixed \(\delta\). The high-probability argument of Proposition~\ref{prop:risk-consistency}(b) gives \eqref{eq:rt-risk-consistency}. If the same rate condition holds and the margin condition in part (c) is imposed, let \(\Pi_Y(j)=\argmin_{k\in\Kcal}R^Y_{j,k}\). Every method outside \(\Pi_Y(j)\) has release excess risk at least \(\gamma_Y\). Since the supremum of the selected excess risks is smaller than \(\gamma_Y\) with probability approaching one, the selected method belongs to \(\Pi_Y(j)\) uniformly over initialized vintages and release-relevant states.
+
+\subsection*{Proof of Corollary~\ref{cor:rt-local-regret}}
+Assumption~\ref{ass:rt-environment} imposes the real-time feasibility and full-validation requirements for the local release experiment. Proposition~\ref{prop:rt-release-alignment} places the local release-validated completion problem in the aligned case of Section~\ref{sec:selection}: the validation and local target losses coincide, the validation and local target populations coincide, and every candidate method can be scored after release. Thus the validation-target link holds with \(\Lambda=1\) and \(\eta_B=0\), and the observability condition is satisfied by the delayed full-validation archive. Assumption~\ref{ass:rt-concentration} is the corresponding concentration condition, with constant \(C_Y\) and effective sample size \(\underline n^{Y,\mathrm{eff}}_B\). The uniform bound on local release excess risks by \(\bar L_Y\) is the corresponding bounded-excess condition.
+
+Applying Theorem~\ref{thm:oracle-approximation} with these substitutions gives the following bound on the intersection of the release-validation concentration event and \(\{M^Y_B>0\}\):
+\begin{equation*}
+    \frac{\mathcal R^Y_B(\widehat\pi^Y)}{M^Y_B}
+    \leq
+    2C_Y
+    \sqrt{\frac{\log(JKB/\delta)}{\underline n^{Y,\mathrm{eff}}_B}}
+    +
+    \bar L_Y\frac{M^{Y,0}_B}{M^Y_B}.
+\end{equation*}
+The concentration event has probability at least \(1-\delta\), so this is \eqref{eq:rt-local-regret-bound}. Under the rate conditions
+\[
+\log(JKB)/\underline n^{Y,\mathrm{eff}}_B=o_p(1),\qquad
+M^{Y,0}_B/M^Y_B=o_p(1),\qquad
+\Prb\{M^Y_B>0\}\to1,
+\]
+the right-hand side converges to zero in probability by the same argument used in the proof of Theorem~\ref{thm:oracle-approximation}. Hence \(\mathcal R^Y_B(\widehat\pi^Y)/M^Y_B=o_p(1)\).
+
+\subsection*{Proof of Theorem~\ref{thm:rt-normality}}
+The result combines a finite-dimensional release-array central limit theorem with the multivariate delta method. Decompose
+\begin{equation*}
+    \sqrt{N^Y_\tau}(\bar Z^Y_\tau-\mu^Y)
+    =
+    \frac{1}{\sqrt{N^Y_\tau}}\sum_{\ell=1}^{N^Y_\tau}(Z^Y_{\tau\ell}-\mu^Y_{\tau\ell})
+    +
+    \sqrt{N^Y_\tau}(\bar\mu^Y_\tau-\mu^Y).
+\end{equation*}
+The second term is \(o(1)\) by Assumption~\ref{ass:rt-fclt}(b). The first term is the value at \(s=1\) of the partial-sum process in Assumption~\ref{ass:rt-fclt}(c); since the evaluation map \(x\mapsto x(1)\) is continuous on paths continuous at one and Brownian paths are continuous with probability one, the continuous mapping theorem gives \eqref{eq:rt-sample-moment-clt}.
+
+In particular, \(\bar Z^Y_\tau\to_p\mu^Y\), so the empirical state shares satisfy \(\widehat p^Y_{\tau,j}\to_p p^Y_j\) uniformly over \(\mathcal J_Y\). By Assumption~\ref{ass:rt-fclt}(a), \(p^Y_j\geq\underline p_Y>0\), so the event \(\min_{j\in\mathcal J_Y}\widehat p^Y_{\tau,j}>0\) has probability approaching one. On that event, \(\widehat\theta^Y_\tau=\phi(\bar Z^Y_\tau)\) is well defined, and \(\phi\) is continuously differentiable at \(\mu^Y\). The multivariate delta method then gives
+\begin{equation*}
+    \sqrt{N^Y_\tau}\left(\widehat\theta^Y_\tau-\theta^Y\right)
+    =
+    D_\phi\sqrt{N^Y_\tau}\left(\bar Z^Y_\tau-\mu^Y\right)+o_p(1)
+    \Rightarrow
+    \mathcal N(0,D_\phi\Omega^Y_\mu D_\phi'),
+\end{equation*}
+proving \eqref{eq:rt-theta-normality}.
+
+If Assumption~\ref{ass:rt-lrv} holds, then \(\widehat\Omega^Y_{\mu,\tau}\to_p\Omega^Y_\mu\): for ordered weakly dependent release records this consistency is covered by HAC arguments such as \citet{NeweyWest1987}, \citet{Andrews1991}, and \citet{deJongDavidson2000Econometrica}; for release-date clusters, by the cluster covariance theory of \citet{HansenLee2019}. Continuity of the derivative gives \(\widehat D_{\phi,\tau}\to_pD_\phi\), and therefore \(\widehat\Omega^Y_{\theta,\tau}=\widehat D_{\phi,\tau}\widehat\Omega^Y_{\mu,\tau}\widehat D_{\phi,\tau}'\to_p\Omega^Y_\theta\). For any fixed contrast \(c\) with \(c'\Omega^Y_\theta c>0\),
+\begin{equation*}
+    \sqrt{N^Y_\tau}\,c'(\widehat\theta^Y_\tau-\theta^Y)
+    \Rightarrow
+    \mathcal N(0,c'\Omega^Y_\theta c),
+\end{equation*}
+and Slutsky's theorem gives the studentized result in \eqref{eq:rt-studentized-contrast}.
+
+The pairwise risk-difference statement following Theorem~\ref{thm:rt-normality} follows by choosing \(c\) to have coefficient one on \((j,k)\), coefficient minus one on \((j,m)\), and zero elsewhere; the variance of this contrast is consistently estimated by \((\widehat\sigma^Y_{j,km})^2=c'\widehat\Omega^Y_{\theta,\tau}c\).
+
+\subsection*{Proof of Corollary~\ref{cor:rt-smooth-target}}
+The result follows from the multivariate delta method applied to the differentiable map \(\psi\). By Theorem~\ref{thm:rt-normality},
+\begin{equation*}
+    \sqrt{N^Y_\tau}(\widehat\theta^Y_\tau-\theta^Y)
+    \Rightarrow
+    \mathcal N(0,\Omega^Y_\theta).
+\end{equation*}
+Since \(\psi\) is continuously differentiable at \(\theta^Y\),
+\begin{equation*}
+    \sqrt{N^Y_\tau}\{\psi(\widehat\theta^Y_\tau)-\psi(\theta^Y)\}
+    =
+    D_\psi\sqrt{N^Y_\tau}(\widehat\theta^Y_\tau-\theta^Y)+o_p(1),
+\end{equation*}
+which gives \eqref{eq:rt-smooth-target-normality}.
+
+\subsection*{Proof of Corollary~\ref{cor:rt-gain-normality}}
+Let \(k^Y_{\mathrm{stat}}\) be the unique best static method and let \(k^Y_j\) be the unique local oracle method in state \(j\). Since the candidate set and state set are finite, uniqueness implies local separation: there is a neighbourhood of \(\theta^Y\) in which the identities of the best static method and of all statewise oracle methods remain unchanged. On this neighbourhood, the gain map in \eqref{eq:rt-local-gain} is the smooth function
+\begin{equation*}
+    \psi_G(\theta^Y)
+    =
+    \sum_{j\in\mathcal J_Y}p^Y_j
+    \left(R^Y_{j,k^Y_{\mathrm{stat}}}-R^Y_{j,k^Y_j}\right).
+\end{equation*}
+Its gradient has components
+\begin{equation*}
+    \frac{\partial\psi_G}{\partial p^Y_j}
+    =
+    R^Y_{j,k^Y_{\mathrm{stat}}}-R^Y_{j,k^Y_j},
+    \qquad
+    \frac{\partial\psi_G}{\partial R^Y_{j,k}}
+    =
+    p^Y_j
+    \left[\1\{k=k^Y_{\mathrm{stat}}\}-\1\{k=k^Y_j\}\right].
+\end{equation*}
+Theorem~\ref{thm:rt-normality} implies \(\widehat\theta^Y_\tau\to_p\theta^Y\), so the probability that \(\widehat\theta^Y_\tau\) lies in the separating neighbourhood tends to one. On that event, \(\widehat{\mathcal G}_{Y,\tau}=\psi_G(\widehat\theta^Y_\tau)\), and the plug-in static and statewise minimizers coincide with their population counterparts. Hence \(\widehat d_{G,\tau}\to_p d_G\). Applying the delta method to \(\psi_G\) and using Theorem~\ref{thm:rt-normality} gives
+\begin{equation*}
+    \sqrt{N^Y_\tau}(\widehat{\mathcal G}_{Y,\tau}-\mathcal G_Y)
+    \Rightarrow
+    \mathcal N(0,d_G'\Omega^Y_\theta d_G).
+\end{equation*}
+As in the proof of Theorem~\ref{thm:rt-normality}, Assumption~\ref{ass:rt-lrv} and continuity of the ratio-map derivative imply \(\widehat\Omega^Y_{\theta,\tau}\to_p\Omega^Y_\theta\). Together with \(\widehat d_{G,\tau}\to_p d_G\), Slutsky's theorem gives the studentized result in \eqref{eq:rt-gain-normality}.
+
+\bibliographystyle{elsarticle-harv}
+\bibliography{References_BfP}
+
+\end{document}
